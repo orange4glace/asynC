@@ -107,7 +107,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 18 "yacc.y"
+#line 19 "yacc.y"
 
   int num;
   char* id;
@@ -115,12 +115,15 @@ typedef union YYSTYPE
   InitDeclaratorNode *init_declarator;
   TypeSpecifierNode *type_specifier;
   InitializerNode *initializer;
+  DeclaratorNode *declarator;
+  IdentifierNode *identifier;
+  DirectDeclaratorNode *direct_declarator;
   ExpressionNode *expression;
 
 
 
 /* Line 1676 of yacc.c  */
-#line 124 "yacc.tab.h"
+#line 127 "yacc.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

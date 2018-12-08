@@ -8,6 +8,7 @@ IS      (u|U|l|L)*
 %{
 #include <string.h>
 #include "ast/ast.h"
+#include "ast/parser/visitor.h"
 #include "yacc.tab.h" 
 
 void count();
@@ -171,6 +172,6 @@ int check_type()
 /*
 * it actually will only return IDENTIFIER
 */
-
+  yylval.id = yytext;
   return(IDENTIFIER);
 }

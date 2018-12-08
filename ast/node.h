@@ -6,8 +6,12 @@
 
 using namespace std;
 
+struct Visitor;
+
 struct Node {
   virtual void Print() = 0;
+
+  virtual void Accept(Visitor* visitor) = 0;
 };
 
 #endif

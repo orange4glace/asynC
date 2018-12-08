@@ -8,4 +8,8 @@ extern void di();
 #include "init_declarator.h"
 #include "type_specifier.h"
 #include "initializer.h"
-#include "expression.h"
+#include "declarator.h"
+#include "identifier.h"
+#include "direct_declarator.h"
+
+#include "expression/expression_include.h"

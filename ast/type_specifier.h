@@ -2,13 +2,12 @@
 #define TYPE_SPECIFIER_H_
 
 #include "node.h"
+#include "type/type.h"
 
 struct TypeSpecifierNode : Node {
-  string type;
+  Type type;
 
-  inline TypeSpecifierNode(char* s) {
-    type = string(s);
-  }
+  inline TypeSpecifierNode(Type type) : type(type) {}
   inline void Print() override {
     indent();
     cout << "[TypeSpecifierNode] " << type << "\n";

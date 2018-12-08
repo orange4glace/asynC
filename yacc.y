@@ -5,6 +5,7 @@
 #include <map>
 #include <list>
 #include "ast/ast.h"
+#include "ast/parser/visitor.h"
 
 using namespace std;
 
@@ -22,6 +23,9 @@ void yyerror(char * s);
   InitDeclaratorNode *init_declarator;
   TypeSpecifierNode *type_specifier;
   InitializerNode *initializer;
+  DeclaratorNode *declarator;
+  IdentifierNode *identifier;
+  DirectDeclaratorNode *direct_declarator;
   ExpressionNode *expression;
 }
 
@@ -33,6 +37,14 @@ void yyerror(char * s);
 %type <init_declarator> init_declarator_list init_declarator
 %type <type_specifier> type_specifier
 %type <initializer> initializer
+%type <declarator> declarator
+%type <direct_declarator> direct_declarator
+%type <expression> primary_expression postfix_expression unary_expression
+    cast_expression multiplicative_expression additive_expression
+    shift_expression relational_expression equality_expression and_expression
+    exclusive_or_expression inclusive_or_expression logical_and_expression
+    logical_or_expression conditional_expression assignment_expression expression
+
 
 %error-verbose
 
@@ -54,15 +66,28 @@ void yyerror(char * s);
 primary_expression
   : IDENTIFIER
   {
-
+    $$ = new IdentifierExpressionNode(
+        new IdentifierNode(yylval.id));
   }
   | CONSTANT
+  {
+    $$ = new ConstantExpressionNode();
+  }
   | STRING_LITERAL
+  {
+    $$ = new StringExpressionNode();
+  }
   | '(' expression ')'
+  {
+    $$ = $2;
+  }
   ;
 
 postfix_expression
   : primary_expression
+  {
+    $$ = $1;
+  }
   ;
 
 unary_expression
@@ -82,76 +107,177 @@ unary_opertaor
   ;
 
 cast_expression
-  : unary_expression
-  | '(' ')' cast_expression
+//: unary_expression
+  : postfix_expression
+  {
+    $$ = $1;
+  }
+//| '(' ')' cast_expression
   ;
 
 multiplicative_expression
   : cast_expression
+  {
+    $$ = $1;
+  }
   | multiplicative_expression '*' cast_expression
+  {
+    $$ = new AdditionExpressionNode($1, $3);
+  }
   | multiplicative_expression '/' cast_expression
+  {
+    $$ = new AdditionExpressionNode($1, $3);
+  }
   | multiplicative_expression '%' cast_expression
+  {
+    $$ = new AdditionExpressionNode($1, $3);
+  }
   ;
 
 additive_expression
   : multiplicative_expression
+  {
+    $$ = $1;
+  }
   | additive_expression '+' multiplicative_expression
+  {
+    $$ = new AdditionExpressionNode($1, $3);
+  }
   | additive_expression '-' multiplicative_expression
+  {
+    $$ = new SubtractionExpressionNode($1, $3);
+  }
   ;
 
 shift_expression
   : additive_expression
+  {
+    $$ = $1;
+  }
   | shift_expression LEFT_OP additive_expression
+  {
+    $$ = new InclusiveORExpressionNode($1, $3);
+  }
   | shift_expression RIGHT_OP additive_expression
+  {
+    $$ = new InclusiveORExpressionNode($1, $3);
+  }
   ;
 
 relational_expression
   : shift_expression
+  {
+    $$ = $1;
+  }
   | relational_expression '<' shift_expression
+  {
+    $$ = new InclusiveORExpressionNode($1, $3);
+  }
   | relational_expression '>' shift_expression
+  {
+    $$ = new InclusiveORExpressionNode($1, $3);
+  }
   | relational_expression LE_OP shift_expression
+  {
+    $$ = new InclusiveORExpressionNode($1, $3);
+  }
   | relational_expression GE_OP shift_expression
+  {
+    $$ = new InclusiveORExpressionNode($1, $3);
+  }
   ;
 
 equality_expression
   : relational_expression
+  {
+    $$ = $1;
+  }
   | equality_expression EQ_OP relational_expression
+  {
+    $$ = new InclusiveORExpressionNode($1, $3);
+  }
   | equality_expression NE_OP relational_expression
+  {
+    $$ = new InclusiveORExpressionNode($1, $3);
+  }
   ;
 
 and_expression
   : equality_expression
+  {
+    $$ = $1;
+  }
   | and_expression '&' equality_expression
+  {
+    $$ = new InclusiveORExpressionNode($1, $3);
+  }
   ;
 
 exclusive_or_expression
   : and_expression
+  {
+    $$ = $1;
+  }
   | exclusive_or_expression '^' and_expression
+  {
+    $$ = new InclusiveORExpressionNode($1, $3);
+  }
   ;
 
 inclusive_or_expression
   : exclusive_or_expression
+  {
+    $$ = $1;
+  }
   | inclusive_or_expression '|' exclusive_or_expression
+  {
+    $$ = new InclusiveORExpressionNode($1, $3);
+  }
   ;
 
 logical_and_expression
   : inclusive_or_expression
+  {
+    $$ = $1;
+  }
   | logical_and_expression AND_OP inclusive_or_expression
+  {
+    $$ = new LogicalANDExpressionNode($1, $3);
+  }
   ;
 
 logical_or_expression
   : logical_and_expression
+  {
+    $$ = $1;
+  }
   | logical_or_expression OR_OP logical_and_expression
+  {
+    $$ = new LogicalORExpressionNode($1, $3);
+  }
   ;
 
 conditional_expression
   : logical_or_expression
+  {
+    $$ = $1;
+  }
   | logical_or_expression '?' expression ':' conditional_expression
+  {
+    $$ = new ConditionalExpressionNode($1, $3, $5);
+  }
   ;
 
 assignment_expression
-  : conditional_expression
+//: conditional_expression
+  : additive_expression
+  {
+    $$ = $1;
+  }
   | unary_expression assignment_operator assignment_expression
+  {
+    $$ = new AssignmentExpressionNode($1, $3);
+  }
   ;
 
 assignment_operator
@@ -177,6 +303,7 @@ init_declarator_list
   }
   | init_declarator ',' init_declarator_list
   {
+    cout << "HAS NEXT\n";
     $1->next = $3;
     $$ = $3;
   }
@@ -185,11 +312,11 @@ init_declarator_list
 init_declarator
   : declarator
   {
-    $$ = new InitDeclaratorNode();
+    $$ = new InitDeclaratorNode($1);
   }
   | declarator '=' initializer
   {
-    $$ = new InitDeclaratorNode($3);
+    $$ = new InitDeclaratorNode($1, $3);
   }
   ;
 
@@ -206,16 +333,22 @@ type_specifier
 
 declarator
   : direct_declarator
+  {
+    $$ = new DeclaratorNode($1);
+  }
   ;
 
 direct_declarator
   : IDENTIFIER
+  {
+    $$ = new DirectDeclaratorNode(new IdentifierNode(yylval.id));
+  }
   ;
 
 initializer
   : assignment_expression
   {
-    $$ = new InitializerNode(nullptr);
+    $$ = new InitializerNode($1);
   }
   ;
 

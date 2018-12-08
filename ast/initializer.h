@@ -1,11 +1,21 @@
 #ifndef INITIALIZER_H_
 #define INITIALIZER_H_
 
-#include "expression.h"
+#include "node.h"
+#include "expression/assignment_expression.h"
 
-struct InitializerNode {
-  inline InitializerNode(ExpressionNode *exp) {
+struct InitializerNode : Node {
+  AssignmentExpressionNode *assignment_expression;
 
+  inline InitializerNode(AssignmentExpressionNode *exp) {
+    assignment_expression = exp;
+  }
+  inline void Print() override {
+    indent();
+    cout << "[Initializer]\n";
+    ii();
+    assignment_expression->Print();
+    di();
   }
 };
 
