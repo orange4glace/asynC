@@ -2,7 +2,11 @@
 #define VISITOR_H_
 
 #include "ast/parser/symbol_table.h"
+#include "ast/statement/statement_include.h"
 #include "ast/expression/expression_include.h"
+#include "ast/type/type.h"
+#include "ast/type/type_value.h"
+#include "ast/type/type_value_factory.h"
 #include "ast/declaration.h"
 #include "ast/declarator.h"
 #include "ast/direct_declarator.h"
@@ -11,10 +15,8 @@
 #include "ast/initializer.h"
 #include "ast/node.h"
 #include "ast/type_specifier.h"
+#include "ast/function_definition.h"
 #include "ast/operator.h"
-#include "ast/type/type.h"
-#include "ast/type/type_value.h"
-#include "ast/type/type_value_factory.h"
 
 extern SymbolTable *symbol_table;
 
@@ -24,6 +26,7 @@ struct Visitor {
 
   ExpressionNode *expression;
   TypeValue* type_value;
+  StatementNode* statement;
 
   Visitor() {
     type_specifier = nullptr;
@@ -33,29 +36,46 @@ struct Visitor {
   }
 
   void Visit(DeclarationNode *node) {
+    indent();
+    cout << "(DeclarationNode)\n";
+    ii();
     node->type_specifier->Accept(this);
     node->init_declarator->Accept(this);
+    di();
   }
 
   void Visit(TypeSpecifierNode *node) {
+    indent();
+    cout << "(TypeSpecifier) " << static_cast<int>(node->type) << "\n";
+    ii();
     type_specifier = node;
     type_value = TypeValueFactory::Create(node->type);
+    di();
   }
 
   void Visit(InitDeclaratorNode *node) {
+    indent();
+    cout << "(InitDeclarator)\n";
+    ii();
     // We know the Type since we visit TypeSpecifierNode
     // before visiting InitDeclarationNode
     node->declarator->Accept(this);
     // Now we have an complete typevalue and identifier
+    IdentifierNode* declarator_identifier = identifier;
     TypeValue* declarator_type_value = type_value;
     if (!node->initializer) {
-      symbol_table->AddSymbol(identifier, type_value);
+      symbol_table->AddSymbol(declarator_identifier, type_value);
+      indent();
+      cout << "(InitDeclarator) AddSymbol " << declarator_identifier->id << " " << *type_value << "\n";
       return;
     }
     node->initializer->Accept(this);
     TypeValue* initializer_type_value = type_value;
     type_value = declarator_type_value->ExecuteOperator(ASSIGNMENT, initializer_type_value);
-    symbol_table->AddSymbol(identifier, type_value);
+    symbol_table->AddSymbol(declarator_identifier, type_value);
+    indent();
+    cout << "(InitDeclarator) AddSymbol " << declarator_identifier->id << " " << *type_value << "\n";
+    di();
   }
 
   void Visit(DeclaratorNode *node) {
@@ -67,17 +87,24 @@ struct Visitor {
   }
 
   void Visit(IdentifierNode *node) {
+    indent();
+    cout << "(Identifier) " << node->id << "\n";
     identifier = node;
   }
 
   void Visit(InitializerNode *node) {
-    node->assignment_expression->Accept(this);
+    node->expression->Accept(this);
   }
 
   void Visit(AssignmentExpressionNode *node) {
+    indent();
+    cout << "(Assignment)\n";
+    ii();
     type_value = nullptr;
     if (node->exp) {
       node->exp->Accept(this);
+      indent();
+      cout << *type_value << endl;
       return;
     }
     node->rhs->Accept(this);
@@ -86,11 +113,14 @@ struct Visitor {
     TypeValue *lhs = type_value;
     lhs->ExecuteOperator(ASSIGNMENT, rhs);
     type_value = lhs;
+    indent();
+    cout << *type_value << endl;
+    di();
   }
 
   void Visit(IdentifierExpressionNode *node) {
-    expression = node;
     node->identifier->Accept(this);
+    type_value = symbol_table->GetSymbol(node->identifier);
   }
 
   void Visit(AdditionExpressionNode *node) {
@@ -104,6 +134,21 @@ struct Visitor {
 
   void Visit(ConstantExpressionNode *node) {
     type_value = node->type_value();
+  }
+
+  void Visit(FunctionDefinitionNode *node) {
+    node->type_specifier->Accept(this);
+    TypeValue *return_type = type_value;
+    node->declarator->Accept(this);
+    IdentifierNode *function_identifier = identifier;
+    node->compound_statement->Accept(this);
+    CompoundStatementNode *function_compound_statement 
+        = static_cast<CompoundStatementNode*>(statement);
+    
+  }
+
+  void Visit(CompoundStatementNode *node) {
+    statement = node;
   }
 
 };

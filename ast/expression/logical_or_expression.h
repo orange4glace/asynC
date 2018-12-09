@@ -11,6 +11,8 @@ struct LogicalORExpressionNode : BinaryExpressionNode {
   inline string name() override {
     return "Logical OR";
   }
+
+  void Accept(Visitor* visitor) override;
 };
 
 #endif

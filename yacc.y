@@ -19,6 +19,9 @@ void yyerror(char * s);
 %union {
   int num;
   char* id;
+
+  Node* node;
+
   DeclarationNode *declaration_node;
   InitDeclaratorNode *init_declarator;
   TypeSpecifierNode *type_specifier;
@@ -27,6 +30,9 @@ void yyerror(char * s);
   IdentifierNode *identifier;
   DirectDeclaratorNode *direct_declarator;
   ExpressionNode *expression;
+  AssignmentExpressionNode *assignment_expression;
+
+  StatementNode *statement;
 }
 
 %error-verbose
@@ -43,7 +49,9 @@ void yyerror(char * s);
     cast_expression multiplicative_expression additive_expression
     shift_expression relational_expression equality_expression and_expression
     exclusive_or_expression inclusive_or_expression logical_and_expression
-    logical_or_expression conditional_expression assignment_expression expression
+    logical_or_expression conditional_expression expression assignment_expression
+%type <statement> statement expression_statement compound_statement
+%type <node> compound_statement_body
 
 
 %error-verbose
@@ -71,7 +79,7 @@ primary_expression
   }
   | CONSTANT
   {
-    $$ = new ConstantExpressionNode();
+    $$ = new ConstantExpressionNode(yylval.num);
   }
   | STRING_LITERAL
   {
@@ -323,11 +331,11 @@ init_declarator
 type_specifier
   : VOID
   {
-    $$ = new TypeSpecifierNode("void");
+    $$ = new TypeSpecifierNode(Type::VOID);
   }
   | INT
   {
-    $$ = new TypeSpecifierNode("int");
+    $$ = new TypeSpecifierNode(Type::INTEGER);
   }
   ;
 
@@ -352,11 +360,59 @@ initializer
   }
   ;
 
+statement
+  : compound_statement
+  {
+    $$ = $1;
+  }
+  | expression_statement
+  {
+    $$ = $1;
+  }
+  ;
+
+expression_statement
+//: ';'
+  : expression ';'
+  {
+    $$ = $1;
+  }
+  ;
+
+function_definition
+  : type_specifier declarator '(' ')' compound_statement
+  ;
+
+compound_statement
+  : '{' '}'
+  {
+    $$ = new CompoundStatementNode(nullptr);
+  }
+  | '{' compound_statement_body '}'
+  {
+    $$ = new CompoundStatementNode($2);
+  }
+  ;
+
+compound_statement_body
+  : declaration
+  {
+    $$ = $1;
+  }
+  | compound_statement_body declaration
+  {
+    $1->next = $2;
+    $$ = $1;
+  }
+  ;
+
 external_declaration 
   : declaration
   {
     $1->Print();
+    visitor->Visit($1);
   }
+  | function_definition
   ;
 
 translation_unit
@@ -368,6 +424,7 @@ translation_unit
 
 
 main() {
+  init_ast();
   yyparse();
   // root->Print();
 }

@@ -1,3 +1,6 @@
+#ifndef EXPRESSION_INCLUDE_H_
+#define EXPRESSION_INCLUDE_H_
+
 #include "expression.h"
 #include "binary_expression.h"
 #include "addition_expression.h"
@@ -11,3 +14,5 @@
 #include "logical_or_expression.h"
 #include "string_expression.h"
 #include "subtraction_expression.h"
+
+#endif

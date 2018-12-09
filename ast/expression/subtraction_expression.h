@@ -11,6 +11,8 @@ struct SubtractionExpressionNode : BinaryExpressionNode {
   inline string name() override {
     return "Subtraction";
   }
+
+  void Accept(Visitor* visitor) override;
 };
 
 #endif

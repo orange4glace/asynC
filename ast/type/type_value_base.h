@@ -18,10 +18,10 @@ struct TypeValueBase : TypeValue {
     Derived::function_map.insert({type_pair, func});
   }
 
-  TypeValue* ExecuteOperator(Operator op, TypeValue *rhs) {
+  TypeValue* ExecuteOperator(Operator op, TypeValue *rhs) override {
     TypePair key(op, this->type(), rhs->type());
-    assert(function_map.count(key) != 0);
-    auto func = function_map[key];
+    assert(Derived::function_map.count(key) != 0);
+    auto func = Derived::function_map[key];
     return func(this, rhs);
   }
 
@@ -30,5 +30,8 @@ struct TypeValueBase : TypeValue {
   }
 
 };
+
+template <typename Derived>
+map<TypePair, function<TypeValue*(TypeValue*, TypeValue*)> > TypeValueBase<Derived>::function_map;
 
 #endif

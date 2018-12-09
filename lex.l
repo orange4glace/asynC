@@ -56,7 +56,7 @@ int comment();
 
 0[xX]{H}+{IS}?    { count(); return(CONSTANT); }
 0{D}+{IS}?    { count(); return(CONSTANT); }
-{D}+{IS}?   { count(); return(CONSTANT); }
+{D}+{IS}?   { count(); yylval.num = atoi(yytext); return(CONSTANT); }
 L?'(\\.|[^\\'])+' { count(); return(CONSTANT); }
 
 {D}+{E}{FS}?    { count(); return(CONSTANT); }

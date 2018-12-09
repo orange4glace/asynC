@@ -111,6 +111,9 @@ typedef union YYSTYPE
 
   int num;
   char* id;
+
+  Node* node;
+
   DeclarationNode *declaration_node;
   InitDeclaratorNode *init_declarator;
   TypeSpecifierNode *type_specifier;
@@ -119,11 +122,14 @@ typedef union YYSTYPE
   IdentifierNode *identifier;
   DirectDeclaratorNode *direct_declarator;
   ExpressionNode *expression;
+  AssignmentExpressionNode *assignment_expression;
+
+  StatementNode *statement;
 
 
 
 /* Line 1676 of yacc.c  */
-#line 127 "yacc.tab.h"
+#line 133 "yacc.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

@@ -11,6 +11,8 @@ struct AdditionExpressionNode : BinaryExpressionNode {
   inline string name() override {
     return "Addition";
   }
+
+  void Accept(Visitor* visitor) override;
 };
 
 #endif

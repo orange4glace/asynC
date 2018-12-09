@@ -21,6 +21,8 @@ struct DeclarationNode : Node {
     init_declarator->Print();
     di();
   }
+
+  void Accept(Visitor* visitor) override;
 };
 
 #endif

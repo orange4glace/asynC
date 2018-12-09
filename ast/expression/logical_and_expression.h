@@ -11,6 +11,8 @@ struct LogicalANDExpressionNode : BinaryExpressionNode {
   inline string name() override {
     return "Logical AND";
   }
+
+  void Accept(Visitor* visitor) override;
 };
 
 #endif

@@ -27,6 +27,8 @@ struct AssignmentExpressionNode : ExpressionNode {
     }
     di();
   }
+
+  void Accept(Visitor* visitor) override;
 };
 
 #endif

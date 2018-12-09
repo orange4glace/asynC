@@ -17,6 +17,8 @@ struct DirectDeclaratorNode : Node {
     identifier->Print();
     di();
   }
+
+  void Accept(Visitor* visitor) override;
 };
 
 #endif

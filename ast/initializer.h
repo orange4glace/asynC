@@ -5,18 +5,20 @@
 #include "expression/assignment_expression.h"
 
 struct InitializerNode : Node {
-  AssignmentExpressionNode *assignment_expression;
+  ExpressionNode *expression;
 
-  inline InitializerNode(AssignmentExpressionNode *exp) {
-    assignment_expression = exp;
+  inline InitializerNode(ExpressionNode *exp) {
+    expression = exp;
   }
   inline void Print() override {
     indent();
     cout << "[Initializer]\n";
     ii();
-    assignment_expression->Print();
+    expression->Print();
     di();
   }
+
+  void Accept(Visitor* visitor) override;
 };
 
 #endif

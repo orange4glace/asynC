@@ -31,6 +31,8 @@ struct InitDeclaratorNode : Node {
 
     if (next != nullptr) next->Print();
   }
+
+  void Accept(Visitor* visitor) override;
 };
 
 #endif

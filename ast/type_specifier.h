@@ -10,8 +10,10 @@ struct TypeSpecifierNode : Node {
   inline TypeSpecifierNode(Type type) : type(type) {}
   inline void Print() override {
     indent();
-    cout << "[TypeSpecifierNode] " << type << "\n";
+    cout << "[TypeSpecifierNode] " << static_cast<int>(type) << "\n";
   }
+
+  void Accept(Visitor* visitor) override;
 };
 
 #endif

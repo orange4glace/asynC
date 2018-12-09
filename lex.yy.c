@@ -965,7 +965,7 @@ YY_RULE_SETUP
 case 37:
 YY_RULE_SETUP
 #line 59 "lex.l"
-{ count(); return(CONSTANT); }
+{ count(); yylval.num = atoi(yytext); return(CONSTANT); }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP

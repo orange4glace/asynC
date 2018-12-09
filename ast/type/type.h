@@ -1,8 +1,9 @@
 #ifndef TYPE_H_
 #define TYPE_H_
 
-enum Type {
-  INTEGER
+enum class Type : int {
+  VOID        = 0x00,
+  INTEGER, 
 };
 
 #endif

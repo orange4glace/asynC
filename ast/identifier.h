@@ -13,6 +13,8 @@ struct IdentifierNode : Node {
     indent();
     cout << "[Identifier] " << id << "\n";
   }
+
+  void Accept(Visitor* visitor) override;
 };
 
 #endif

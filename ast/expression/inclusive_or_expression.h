@@ -11,6 +11,8 @@ struct InclusiveORExpressionNode : BinaryExpressionNode {
   inline string name() override {
     return "Inclusive OR";
   }
+
+  void Accept(Visitor* visitor) override;
 };
 
 #endif

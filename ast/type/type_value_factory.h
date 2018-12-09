@@ -9,7 +9,7 @@ struct TypeValueFactory {
 
   static TypeValue* Create(Type type) {
     switch (type) {
-    case INTEGER:
+    case Type::INTEGER:
       return new Integer();
     }
     return nullptr;

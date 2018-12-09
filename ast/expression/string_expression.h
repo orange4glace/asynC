@@ -9,6 +9,8 @@ struct StringExpressionNode : ExpressionNode {
       
   inline void Print() override {
   }
+
+  void Accept(Visitor* visitor) override;
 };
 
 #endif
