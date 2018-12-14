@@ -14,5 +14,9 @@
 #include "logical_or_expression.h"
 #include "string_expression.h"
 #include "subtraction_expression.h"
+#include "array_expression.h"
+#include "function_call_expression.h"
+#include "async_expression.h"
+#include "cast_expression.h"
 
 #endif

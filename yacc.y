@@ -33,6 +33,7 @@ void yyerror(char * s);
   AssignmentExpressionNode *assignment_expression;
   FunctionDefinitionNode *function_definition;
   ParameterDeclarationNode *parameter_declaration;
+  TypeNameNode *type_name;
 
   StatementNode *statement;
 }
@@ -52,10 +53,13 @@ void yyerror(char * s);
     shift_expression relational_expression equality_expression and_expression
     exclusive_or_expression inclusive_or_expression logical_and_expression
     logical_or_expression conditional_expression expression assignment_expression
+    argument_expression_list constant_expression async_expression
+    variable_capture_list variable_capture
 %type <statement> statement expression_statement compound_statement
 %type <function_definition> function_definition
 %type <parameter_declaration> parameter_declaration_list parameter_declaration
-%type <node> compound_statement_body
+%type <type_name> type_name
+%type <node> compound_statement_body abstract_declarator direct_abstract_declarator
 
 
 %error-verbose
@@ -93,11 +97,66 @@ primary_expression
   {
     $$ = $2;
   }
+  | async_expression
+  {
+    $$ = $1;
+  }
+  ;
+
+async_expression
+  : '[' ']' compound_statement
+  {
+    $$ = new AsyncExpressionNode(nullptr, static_cast<CompoundStatementNode*>($3));
+  }
+  | '[' variable_capture_list ']' compound_statement
+  {
+    $$ = new AsyncExpressionNode($2, static_cast<CompoundStatementNode*>($4));
+  }
+  ;
+
+variable_capture_list
+  : variable_capture
+  {
+    $$ = $1;
+  }
+  | variable_capture ',' variable_capture_list
+  {
+    $1->next = $3;
+    $$ = $1;
+  }
+  ;
+
+variable_capture
+  : IDENTIFIER
+  {
+    $$ = new IdentifierExpressionNode(
+        new IdentifierNode(yylval.id));
+  }
   ;
 
 postfix_expression
   : primary_expression
   {
+    $$ = $1;
+  }
+  | postfix_expression '[' expression ']'
+  {
+    $$ = new ArrayExpressionNode($1, $3);
+  }
+  | postfix_expression '(' argument_expression_list ')'
+  {
+    $$ = new FunctionCallExpressionNode($1, $3);
+  }
+  ;
+
+argument_expression_list
+  : assignment_expression
+  {
+    $$ = $1;
+  }
+  | assignment_expression ',' argument_expression_list
+  {
+    $1->next = $3;
     $$ = $1;
   }
   ;
@@ -124,7 +183,10 @@ cast_expression
   {
     $$ = $1;
   }
-//| '(' ')' cast_expression
+  | '(' type_name ')' cast_expression
+  {
+    $$ = new CastExpressionNode($2, $4);
+  }
   ;
 
 multiplicative_expression
@@ -355,7 +417,43 @@ direct_declarator
   {
     $$ = new DirectDeclaratorNode(new IdentifierNode(yylval.id));
   }
+  | direct_declarator '[' constant_expression ']'
+  {
+    // Todo : Only 1-dimensional array is allowed
+    $$ = $1;
+    $1->array_constant = static_cast<ConstantExpressionNode*>($3);
+  }
   ;
+
+type_name
+  : type_specifier abstract_declarator
+  {
+    $$ = new TypeNameNode(
+        static_cast<TypeSpecifierNode*>($1),
+        static_cast<AbstractDeclaratorNode*>($2));
+  }
+  ;
+
+abstract_declarator
+  : direct_abstract_declarator
+  {
+    $$ = new AbstractDeclaratorNode(
+      static_cast<DirectAbstractDeclaratorNode*>($1));
+  }
+  ;
+
+direct_abstract_declarator
+  :
+  {
+    $$ = new DirectAbstractDeclaratorNode();
+  }
+  ;
+
+constant_expression
+  : CONSTANT
+  {
+    $$ = new ConstantExpressionNode(yylval.num);
+  }
 
 initializer
   : assignment_expression
@@ -429,7 +527,16 @@ compound_statement_body
   {
     $$ = $1;
   }
-  | compound_statement_body declaration
+  | statement
+  {
+    $$ = $1;
+  }
+  | declaration compound_statement_body
+  {
+    $1->next = $2;
+    $$ = $1;
+  }
+  | statement compound_statement_body
   {
     $1->next = $2;
     $$ = $1;
@@ -440,9 +547,12 @@ external_declaration
   : declaration
   {
     $1->Print();
-    visitor->Visit($1);
+    // visitor->Visit($1);
   }
   | function_definition
+  {
+    $1->Print();
+  }
   ;
 
 translation_unit
