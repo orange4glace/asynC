@@ -18,8 +18,14 @@ struct TypeSpecifierNode : Node {
     case Type::INTEGER :
       cout << "INT";
       break;
+    case Type::FLOAT :
+      cout << "FLOAT";
+      break;
     case Type::FUNCTION :
       cout << "FUNCTION";
+      break;
+    case Type::ASYNC :
+      cout << "ASYNC";
       break;
     default :
       cout << "UNKNOWN";

@@ -20,7 +20,6 @@ struct ParameterDeclarationNode : Node {
     type_specifier->Print();
     declarator->Print();
     di();
-    if (next) next->Print();
   }
 
   void Accept(Visitor* visitor) override;

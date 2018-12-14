@@ -81,22 +81,23 @@
      CONST = 297,
      VOLATILE = 298,
      VOID = 299,
-     STRUCT = 300,
-     UNION = 301,
-     ENUM = 302,
-     ELLIPSIS = 303,
-     CASE = 304,
-     DEFAULT = 305,
-     IF = 306,
-     ELSE = 307,
-     SWITCH = 308,
-     WHILE = 309,
-     DO = 310,
-     FOR = 311,
-     GOTO = 312,
-     CONTINUE = 313,
-     BREAK = 314,
-     RETURN = 315
+     ASYNC = 300,
+     STRUCT = 301,
+     UNION = 302,
+     ENUM = 303,
+     ELLIPSIS = 304,
+     CASE = 305,
+     DEFAULT = 306,
+     IF = 307,
+     ELSE = 308,
+     SWITCH = 309,
+     WHILE = 310,
+     DO = 311,
+     FOR = 312,
+     GOTO = 313,
+     CONTINUE = 314,
+     BREAK = 315,
+     RETURN = 316
    };
 #endif
 
@@ -132,7 +133,7 @@ typedef union YYSTYPE
 
 
 /* Line 1676 of yacc.c  */
-#line 136 "yacc.tab.h"
+#line 137 "yacc.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

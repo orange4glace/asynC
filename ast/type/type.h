@@ -3,7 +3,9 @@
 
 enum class Type : int {
   VOID        = 0x00,
-  INTEGER, 
+  INTEGER,
+  FLOAT,
+  ASYNC,
   FUNCTION,
 };
 

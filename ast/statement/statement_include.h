@@ -5,5 +5,6 @@
 #include "ast/statement/compound_statement.h"
 #include "ast/statement/selection_statement.h"
 #include "ast/statement/iteration_statement.h"
+#include "ast/statement/return_statement.h"
 
 #endif

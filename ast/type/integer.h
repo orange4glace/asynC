@@ -2,6 +2,7 @@
 #define INTEGER_H_
 
 #include "type_value_base.h"
+#include "ast/parser/symbol_table.h"
 
 struct Integer : TypeValueBase<Integer> {
   int value;
@@ -12,9 +13,18 @@ struct Integer : TypeValueBase<Integer> {
       [](TypeValue* l, TypeValue* r) -> TypeValue* {
         Integer* lhs = static_cast<Integer*>(l);
         Integer* rhs = static_cast<Integer*>(r);
-        Integer* integer = new Integer();
-        integer->value = lhs->value + rhs->value;
-        return integer;
+        Integer* res = new Integer();
+        res->value = lhs->value + rhs->value;
+
+        // Code generation
+        symbol_table->PushStackFrameBack(res);
+        res->stack_frame_offset = symbol_table->PushStackFrameBack();
+        symbol_table->AppendCode("sss",
+            "mov", res->GetStackFrameAddress(), l->GetStackFrameAddress());
+        symbol_table->AppendCode("sss",
+            "add", res->GetStackFrameAddress(), r->GetStackFrameAddress());
+
+        return res;
       }
     );
     Integer::AddOperatorFunction(
@@ -23,6 +33,11 @@ struct Integer : TypeValueBase<Integer> {
         Integer* lhs = static_cast<Integer*>(l);
         Integer* rhs = static_cast<Integer*>(r);
         lhs->value = rhs->value;
+
+        // Code generation
+        symbol_table->AppendCode("sss",
+            "mov", lhs->GetStackFrameAddress(), rhs->GetStackFrameAddress());
+
         return lhs;
       }
     );

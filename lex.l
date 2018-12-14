@@ -35,6 +35,7 @@ int comment();
 "for"     { count(); return(FOR); }
 "goto"      { count(); return(GOTO); }
 "if"      { count(); return(IF); }
+"async"   { count(); return(ASYNC); }
 "int"     { count(); return(INT); }
 "long"      { count(); return(LONG); }
 "register"    { count(); return(REGISTER); }

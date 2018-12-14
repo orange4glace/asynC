@@ -25,8 +25,6 @@
 #include "ast/parameter_declaration.h"
 #include "ast/operator.h"
 
-extern SymbolTable *symbol_table;
-
 struct Visitor {
   TypeSpecifierNode *type_specifier;
 
@@ -70,8 +68,11 @@ struct Visitor {
     // Now we have an complete typevalue and identifier
     Identifier* declarator_identifier = identifier;
     TypeValue* declarator_type_value = type_value;
+    // TODO : COPY COPY COPY COPY COPY COPY COPY COPY COPY COPY COPY COPY COPY COPY COPY COPY COPY COPY COPY
+    symbol_table->PushStackFrameBack(declarator_type_value);
     if (!node->initializer) {
       symbol_table->AddSymbol(declarator_identifier, type_value);
+      symbol_table->PushStackFrameBack(declarator_identifier);
       indent();
       cout << "(InitDeclarator) AddSymbol " << declarator_identifier->id << " " << *type_value << "\n";
       return;
@@ -141,6 +142,7 @@ struct Visitor {
 
   void Visit(ConstantExpressionNode *node) {
     type_value = node->type_value();
+    symbol_table->PushStackFrameBack(type_value);
   }
 
   void Visit(FunctionDefinitionNode *node) {

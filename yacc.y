@@ -56,6 +56,7 @@ void yyerror(char * s);
     argument_expression_list constant_expression async_expression
     variable_capture_list variable_capture
 %type <statement> statement expression_statement compound_statement selection_statement iteration_statement
+    return_statement
 %type <function_definition> function_definition
 %type <parameter_declaration> parameter_declaration_list parameter_declaration
 %type <type_name> type_name
@@ -71,7 +72,7 @@ void yyerror(char * s);
 %token XOR_ASSIGN OR_ASSIGN TYPE_NAME
 
 %token TYPEDEF EXTERN STATIC AUTO REGISTER
-%token CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE CONST VOLATILE VOID
+%token CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE CONST VOLATILE VOID ASYNC
 %token STRUCT UNION ENUM ELLIPSIS
 
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
@@ -403,6 +404,14 @@ type_specifier
   {
     $$ = new TypeSpecifierNode(Type::INTEGER);
   }
+  | FLOAT
+  {
+    $$ = new TypeSpecifierNode(Type::FLOAT);
+  }
+  | ASYNC
+  {
+    $$ = new TypeSpecifierNode(Type::ASYNC);
+  }
   ;
 
 declarator
@@ -466,10 +475,8 @@ statement
   : compound_statement { $$ = $1; }
   | iteration_statement { $$ = $1; }
   | selection_statement { $$ = $1; }
-  | expression_statement
-  {
-    $$ = $1;
-  }
+  | return_statement { $$ = $1; }
+  | expression_statement { $$ = $1; }
   ;
 
 expression_statement
@@ -498,8 +505,8 @@ parameter_declaration_list
   }
   | parameter_declaration ',' parameter_declaration_list
   {
-    $$ = $1;
     $1->next = $3;
+    $$ = $1;
   }
   ;
 
@@ -558,11 +565,19 @@ iteration_statement
     $$ = new IterationStatementNode($3, $5);
   }
 
+return_statement
+  : RETURN expression ';'
+  {
+    $$ = new ReturnStatementNode($2);
+  }
+  ;
+
 external_declaration 
   : declaration
   {
     $1->Print();
-    // visitor->Visit($1);
+    visitor->Visit($1);
+    symbol_table->PrintCode();
   }
   | function_definition
   {
