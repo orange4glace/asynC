@@ -6,10 +6,10 @@
 #include "ast/declarator.h"
 
 struct ParameterDeclarationNode : Node {
-  TypeSpecifier *type_specifier;
-  Declarator *declarator;
+  TypeSpecifierNode *type_specifier;
+  DeclaratorNode *declarator;
 
-  inline ParameterDeclarationNode(TypeSpecifier *ts, Declarator *decl) {
+  inline ParameterDeclarationNode(TypeSpecifierNode *ts, DeclaratorNode *decl) {
     type_specifier = ts;
     declarator = decl;
   }

@@ -33,4 +33,4 @@ void InitDeclaratorNode::Accept(Visitor *visitor) { visitor->Visit(this); }
 void InitializerNode::Accept(Visitor *visitor) { visitor->Visit(this); }
 void TypeSpecifierNode::Accept(Visitor *visitor) { visitor->Visit(this); }
 void FunctionDefinitionNode::Accept(Visitor *visitor) { visitor->Visit(this); }
-void ParameterDeclaration::Accept(Visitor *visitor) { visitor->Visit(this); }
+void ParameterDeclarationNode::Accept(Visitor *visitor) { visitor->Visit(this); }

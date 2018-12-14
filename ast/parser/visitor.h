@@ -7,9 +7,9 @@
 #include "ast/type/type.h"
 #include "ast/type/type_value.h"
 #include "ast/type/type_value_factory.h"
-#include "ast/type/identifier.h.h"
-#include "ast/type/function.h.h"
-#include "ast/type/function_parameter.h.h"
+#include "ast/type/identifier.h"
+#include "ast/type/function.h"
+#include "ast/type/function_parameter.h"
 #include "ast/declaration.h"
 #include "ast/declarator.h"
 #include "ast/direct_declarator.h"
@@ -26,10 +26,10 @@ extern SymbolTable *symbol_table;
 
 struct Visitor {
   TypeSpecifierNode *type_specifier;
-  IdentifierNode *identifier;
 
   ExpressionNode *expression;
-  TypeValue* type_value;
+  Identifier *identifier;
+  TypeValue *type_value;
   StatementNode* statement;
 
   Visitor() {
@@ -65,10 +65,10 @@ struct Visitor {
     // before visiting InitDeclarationNode
     node->declarator->Accept(this);
     // Now we have an complete typevalue and identifier
-    IdentifierNode* declarator_identifier = identifier;
+    Identifier* declarator_identifier = identifier;
     TypeValue* declarator_type_value = type_value;
     if (!node->initializer) {
-      symbol_table->AddSymbol(new Identifier(declarator_identifier), type_value);
+      symbol_table->AddSymbol(declarator_identifier, type_value);
       indent();
       cout << "(InitDeclarator) AddSymbol " << declarator_identifier->id << " " << *type_value << "\n";
       return;
@@ -76,7 +76,7 @@ struct Visitor {
     node->initializer->Accept(this);
     TypeValue* initializer_type_value = type_value;
     type_value = declarator_type_value->ExecuteOperator(ASSIGNMENT, initializer_type_value);
-    symbol_table->AddSymbol(new Identifier(declarator_identifier), type_value);
+    symbol_table->AddSymbol(declarator_identifier, type_value);
     indent();
     cout << "(InitDeclarator) AddSymbol " << declarator_identifier->id << " " << *type_value << "\n";
     di();
@@ -93,7 +93,7 @@ struct Visitor {
   void Visit(IdentifierNode *node) {
     indent();
     cout << "(Identifier) " << node->id << "\n";
-    identifier = node;
+    identifier = new Identifier(node);
   }
 
   void Visit(InitializerNode *node) {
@@ -124,7 +124,7 @@ struct Visitor {
 
   void Visit(IdentifierExpressionNode *node) {
     node->identifier->Accept(this);
-    type_value = symbol_table->GetSymbol(Identifier(identifier));
+    type_value = symbol_table->GetSymbol(identifier);
   }
 
   void Visit(AdditionExpressionNode *node) {
@@ -141,22 +141,22 @@ struct Visitor {
   }
 
   void Visit(FunctionDefinitionNode *node) {
-    Function function = new Function();
+    Function* function = new Function();
     node->type_specifier->Accept(this);
     TypeValue *return_type = type_value;
     node->declarator->Accept(this);
-    IdentifierNode *function_identifier = identifier;
+    Identifier *function_identifier = identifier;
     ParameterDeclarationNode *pdecl = node->parameter_declaration_list;
     SymbolTable *fn_symbol_table = new SymbolTable(symbol_table);
     while (pdecl) {
       pdecl->Accept(this);
-      Identifier *fn_parameter_identifier = new Identifier(identifier);
+      Identifier *fn_parameter_identifier = identifier;
       TypeValue *fn_parameter_type_value = type_value;
       FunctionParameter *fn_parameter =
           new FunctionParameter(fn_parameter_identifier, fn_parameter_type_value);
       fn_symbol_table->AddSymbol(fn_parameter_identifier, fn_parameter_type_value);
       function->parameters.push_back(fn_parameter);
-      pdecl = pdecl->next;
+      pdecl = static_cast<ParameterDeclarationNode*>(pdecl->next);
     }
     node->compound_statement->Accept(this);
     CompoundStatementNode *function_compound_statement 
