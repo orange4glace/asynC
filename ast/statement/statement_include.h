@@ -3,5 +3,7 @@
 
 #include "ast/statement/statement.h"
 #include "ast/statement/compound_statement.h"
+#include "ast/statement/selection_statement.h"
+#include "ast/statement/iteration_statement.h"
 
 #endif

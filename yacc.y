@@ -31,8 +31,6 @@ void yyerror(char * s);
   DirectDeclaratorNode *direct_declarator;
   ExpressionNode *expression;
   AssignmentExpressionNode *assignment_expression;
-  FunctionDefinitionNode *function_definition;
-  ParameterDeclarationNode *parameter_declaration;
 
   StatementNode *statement;
 }
@@ -52,9 +50,7 @@ void yyerror(char * s);
     shift_expression relational_expression equality_expression and_expression
     exclusive_or_expression inclusive_or_expression logical_and_expression
     logical_or_expression conditional_expression expression assignment_expression
-%type <statement> statement expression_statement compound_statement
-%type <function_definition> function_definition
-%type <parameter_declaration> parameter_declaration_list parameter_declaration
+%type <statement> statement expression_statement compound_statement selection_statement iteration_statement
 %type <node> compound_statement_body
 
 
@@ -106,10 +102,10 @@ unary_expression
   : postfix_expression
   | INC_OP unary_expression
   | DEC_OP unary_expression
-  | unary_opertaor cast_expression
+  | unary_operator cast_expression
   ;
 
-unary_opertaor
+unary_operator
   : '&'
   | '*'
   | '+'
@@ -386,11 +382,11 @@ expression_statement
 function_definition
   : type_specifier declarator '(' parameter_declaration_list ')' compound_statement
   {
-    $$ = new FunctionDefinitionNode($1, $2, $4, static_cast<CompoundStatementNode*>($6));
+    $$ = new FunctionDefinitionNode($1, $2, $4, $6);
   }
   | type_specifier declarator '(' ')' compound_statement
   {
-    $$ = new FunctionDefinitionNode($1, $2, nullptr, static_cast<CompoundStatementNode*>($5));
+    $$ = new FunctionDefinitionNode($1, $2, nullptr, $5);
   }
   ;
 
@@ -402,7 +398,7 @@ parameter_declaration_list
   | parameter_declaration ',' parameter_declaration_list
   {
     $$ = $1;
-    $1->next = $3;
+    $1->next = $2;
   }
   ;
 
@@ -435,6 +431,22 @@ compound_statement_body
     $$ = $1;
   }
   ;
+
+selection_statement
+  : IF '(' expression ')' statement
+  {
+    $$ = new SelectionStatementNode($3, $5);
+  }
+  | IF '(' expression ')' statement ELSE statement {
+    $$ = new SelectionStatementNode($3, $5, $7);
+  }
+  ;
+
+iteration_statement
+  : WHILE '(' expression ')' statement
+  {
+    $$ = new IterationStatementNode($3, $5);
+  }
 
 external_declaration 
   : declaration
