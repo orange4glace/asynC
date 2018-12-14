@@ -1,13 +1,16 @@
 #include "ast/ast.h"
 #include "ast/declarator.h"
+#include "ast/abstract_declarator.h"
 #include "ast/declaration.h"
 #include "ast/direct_declarator.h"
+#include "ast/direct_abstract_declarator.h"
 #include "ast/identifier.h"
 #include "ast/init_declarator.h"
 #include "ast/initializer.h"
 #include "ast/type_specifier.h"
 #include "ast/function_definition.h"
 #include "ast/parameter_declaration.h"
+#include "ast/type_name.h"
 #include "ast/parser/visitor.h"
 
 #include "ast/type/integer.h"
@@ -34,3 +37,6 @@ void InitializerNode::Accept(Visitor *visitor) { visitor->Visit(this); }
 void TypeSpecifierNode::Accept(Visitor *visitor) { visitor->Visit(this); }
 void FunctionDefinitionNode::Accept(Visitor *visitor) { visitor->Visit(this); }
 void ParameterDeclarationNode::Accept(Visitor *visitor) { visitor->Visit(this); }
+void AbstractDeclaratorNode::Accept(Visitor *visitor) { assert(false); /* visitor->Visit(this); */ }
+void DirectAbstractDeclaratorNode::Accept(Visitor *visitor) { assert(false); /* visitor->Visit(this); */ }
+void TypeNameNode::Accept(Visitor *visitor) { assert(false); /* visitor->Visit(this); */ }

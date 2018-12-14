@@ -14,7 +14,14 @@ struct CompoundStatementNode : StatementNode {
 
   inline void Print() override {
     indent();
-    cout << "[CompoundStatement]" << endl;
+    cout << "[CompoundStatement]\n";
+    ii();
+    Node *cur = node_list;
+    while (cur) {
+      cur->Print();
+      cur = cur->next;
+    }
+    di();
   }
 
   void Accept(Visitor* visitor) override;

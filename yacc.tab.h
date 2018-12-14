@@ -125,13 +125,14 @@ typedef union YYSTYPE
   AssignmentExpressionNode *assignment_expression;
   FunctionDefinitionNode *function_definition;
   ParameterDeclarationNode *parameter_declaration;
+  TypeNameNode *type_name;
 
   StatementNode *statement;
 
 
 
 /* Line 1676 of yacc.c  */
-#line 135 "yacc.tab.h"
+#line 136 "yacc.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

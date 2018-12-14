@@ -172,6 +172,7 @@ int check_type()
 /*
 * it actually will only return IDENTIFIER
 */
-  yylval.id = yytext;
+  yylval.id = new char[strlen(yytext) + 1];
+  strcpy(yylval.id, yytext);
   return(IDENTIFIER);
 }

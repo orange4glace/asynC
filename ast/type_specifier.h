@@ -10,7 +10,22 @@ struct TypeSpecifierNode : Node {
   inline TypeSpecifierNode(Type type) : type(type) {}
   inline void Print() override {
     indent();
-    cout << "[TypeSpecifierNode] " << static_cast<int>(type) << "\n";
+    cout << "[TypeSpecifier] ";
+    switch (type) {
+    case Type::VOID :
+      cout << "VOID";
+      break;
+    case Type::INTEGER :
+      cout << "INT";
+      break;
+    case Type::FUNCTION :
+      cout << "FUNCTION";
+      break;
+    default :
+      cout << "UNKNOWN";
+      break;
+    }
+    cout << "\n";
   }
 
   void Accept(Visitor* visitor) override;

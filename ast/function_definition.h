@@ -28,7 +28,15 @@ struct FunctionDefinitionNode : Node {
     ii();
     type_specifier->Print();
     declarator->Print();
-    parameter_declaration_list->Print();
+    indent();
+    cout << "[ParameterDeclaratorList]\n";
+    ii();
+    Node *param = parameter_declaration_list;
+    while (param) {
+      param->Print();
+      param = param->next;
+    }
+    di();
     compound_statement->Print();
     di();
   }
