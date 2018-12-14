@@ -1,8 +1,8 @@
 #ifndef SELECTION_STATEMENT_H_
 #define SELECTION_STATEMENT_H_
 
+#include "ast/expression/expression.h"
 #include "ast/statement/statement.h"
-#include "ast/expression/expression_include.h"
 /*
 selection_statement
   : IF '(' expression ')' statement

@@ -55,7 +55,7 @@ void yyerror(char * s);
     logical_or_expression conditional_expression expression assignment_expression
     argument_expression_list constant_expression async_expression
     variable_capture_list variable_capture
-%type <statement> statement expression_statement compound_statement
+%type <statement> statement expression_statement compound_statement selection_statement iteration_statement
 %type <function_definition> function_definition
 %type <parameter_declaration> parameter_declaration_list parameter_declaration
 %type <type_name> type_name
@@ -463,10 +463,9 @@ initializer
   ;
 
 statement
-  : compound_statement
-  {
-    $$ = $1;
-  }
+  : compound_statement { $$ = $1; }
+  | iteration_statement { $$ = $1; }
+  | selection_statement { $$ = $1; }
   | expression_statement
   {
     $$ = $1;
@@ -484,11 +483,11 @@ expression_statement
 function_definition
   : type_specifier declarator '(' parameter_declaration_list ')' compound_statement
   {
-    $$ = new FunctionDefinitionNode($1, $2, $4, $6);
+    $$ = new FunctionDefinitionNode($1, $2, $4, static_cast<CompoundStatementNode*>($6));
   }
   | type_specifier declarator '(' ')' compound_statement
   {
-    $$ = new FunctionDefinitionNode($1, $2, nullptr, $5);
+    $$ = new FunctionDefinitionNode($1, $2, nullptr, static_cast<CompoundStatementNode*>($5));
   }
   ;
 
@@ -500,7 +499,7 @@ parameter_declaration_list
   | parameter_declaration ',' parameter_declaration_list
   {
     $$ = $1;
-    $1->next = $2;
+    $1->next = $3;
   }
   ;
 
