@@ -1,15 +1,17 @@
+/*
 #ifndef SYMBOL_TABLE_ENTRY_H_
 #define SYMBOL_TABLE_ENTRY_H_
 
-#include "../type_specifier.h"
+#include "ast/type/identifier.h"
+#include "ast/type_specifier.h"
 
 struct SymbolTableEntry {
 
   TypeSpecifierNode *type_specifier;
-  IdentifierNode *identifier;
+  Identifier *identifier;
   void* value;
 
-  SymbolTableEntry(TypeSpecifierNode *ts, IdentifierNode *id) {
+  SymbolTableEntry(TypeSpecifierNode *ts, Identifier *id) {
     type_specifier = ts;
     identifier = id;
   }
@@ -17,3 +19,4 @@ struct SymbolTableEntry {
 };
 
 #endif
+*/

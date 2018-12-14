@@ -380,7 +380,33 @@ expression_statement
   ;
 
 function_definition
-  : type_specifier declarator '(' ')' compound_statement
+  : type_specifier declarator '(' parameter_declaration_list ')' compound_statement
+  {
+    $$ = new FunctionDefinitionNode($1, $2, $4, $6);
+  }
+  | type_specifier declarator '(' ')' compound_statement
+  {
+    $$ = new FunctionDefinitionNode($1, $2, nullptr, $5);
+  }
+  ;
+
+parameter_declaration_list
+  : parameter_declaration
+  {
+    $$ = $1;
+  }
+  | parameter_declaration ',' parameter_declaration_list
+  {
+    $$ = $1;
+    $1->next = $2;
+  }
+  ;
+
+parameter_declaration
+  : type_specifier declarator
+  {
+    $$ = new ParameterDeclarationNode($1, $2);
+  }
   ;
 
 compound_statement
