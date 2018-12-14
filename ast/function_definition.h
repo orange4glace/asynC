@@ -4,18 +4,22 @@
 #include "ast/node.h"
 #include "ast/type_specifier.h"
 #include "ast/declarator.h"
+#include "ast/parameter_declaration.h"
 #include "ast/statement/compound_statement.h"
 
 struct FunctionDefinitionNode : Node {
   TypeSpecifierNode *type_specifier;
   DeclaratorNode *declarator;
+  ParameterDeclarationNode *parameter_declaration_list;
   CompoundStatementNode *compound_statement;
 
   inline FunctionDefinitionNode(
       TypeSpecifierNode *ts,
       DeclaratorNode *dl,
+      ParameterDeclarationNode *pd,
       CompoundStatementNode *cs
-  ) : type_specifier(ts), declarator(dl), compound_statement(cs) {
+  ) : type_specifier(ts), declarator(dl),
+      parameter_declaration_list(pd), compound_statement(cs) {
   }
 
   inline void Print() override {
@@ -24,6 +28,7 @@ struct FunctionDefinitionNode : Node {
     ii();
     type_specifier->Print();
     declarator->Print();
+    parameter_declaration_list->Print();
     compound_statement->Print();
     di();
   }

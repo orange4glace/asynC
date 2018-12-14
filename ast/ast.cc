@@ -7,6 +7,7 @@
 #include "ast/initializer.h"
 #include "ast/type_specifier.h"
 #include "ast/function_definition.h"
+#include "ast/parameter_declaration.h"
 #include "ast/parser/visitor.h"
 
 #include "ast/type/integer.h"
@@ -32,3 +33,4 @@ void InitDeclaratorNode::Accept(Visitor *visitor) { visitor->Visit(this); }
 void InitializerNode::Accept(Visitor *visitor) { visitor->Visit(this); }
 void TypeSpecifierNode::Accept(Visitor *visitor) { visitor->Visit(this); }
 void FunctionDefinitionNode::Accept(Visitor *visitor) { visitor->Visit(this); }
+void ParameterDeclaration::Accept(Visitor *visitor) { visitor->Visit(this); }
