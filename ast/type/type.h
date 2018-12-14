@@ -4,6 +4,7 @@
 enum class Type : int {
   VOID        = 0x00,
   INTEGER, 
+  FUNCTION,
 };
 
 #endif

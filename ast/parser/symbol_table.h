@@ -43,6 +43,13 @@ struct SymbolTable {
     return parent->GetSymbol(identifier);
   }
 
+  inline TypeValue* GetSymbol(Identifier&& identifier_value) {
+    Identifier* identifier = &identifier_value;
+    if (table.count(identifier)) return table[identifier];
+    assert(parent != nullptr);
+    return parent->GetSymbol(identifier);
+  }
+
 };
 
 #endif

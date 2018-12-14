@@ -31,6 +31,8 @@ void yyerror(char * s);
   DirectDeclaratorNode *direct_declarator;
   ExpressionNode *expression;
   AssignmentExpressionNode *assignment_expression;
+  FunctionDefinitionNode *function_definition;
+  ParameterDeclarationNode *parameter_declaration;
 
   StatementNode *statement;
 }
@@ -51,6 +53,8 @@ void yyerror(char * s);
     exclusive_or_expression inclusive_or_expression logical_and_expression
     logical_or_expression conditional_expression expression assignment_expression
 %type <statement> statement expression_statement compound_statement
+%type <function_definition> function_definition
+%type <parameter_declaration> parameter_declaration_list parameter_declaration
 %type <node> compound_statement_body
 
 
@@ -382,11 +386,11 @@ expression_statement
 function_definition
   : type_specifier declarator '(' parameter_declaration_list ')' compound_statement
   {
-    $$ = new FunctionDefinitionNode($1, $2, $4, $6);
+    $$ = new FunctionDefinitionNode($1, $2, $4, static_cast<CompoundStatementNode*>($6));
   }
   | type_specifier declarator '(' ')' compound_statement
   {
-    $$ = new FunctionDefinitionNode($1, $2, nullptr, $5);
+    $$ = new FunctionDefinitionNode($1, $2, nullptr, static_cast<CompoundStatementNode*>($5));
   }
   ;
 
@@ -398,7 +402,7 @@ parameter_declaration_list
   | parameter_declaration ',' parameter_declaration_list
   {
     $$ = $1;
-    $1->next = $2;
+    $1->next = $3;
   }
   ;
 

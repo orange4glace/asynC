@@ -1,5 +1,5 @@
-#ifndef IDENTIFIER_H_
-#define IDENTIFIER_H_
+#ifndef IDENTIFIER_TYPE_H_
+#define IDENTIFIER_TYPE_H_
 
 #include "ast/identifier.h"
 
