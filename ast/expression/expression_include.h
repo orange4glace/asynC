@@ -18,5 +18,6 @@
 #include "function_call_expression.h"
 #include "async_expression.h"
 #include "cast_expression.h"
+#include "unary_expression.h"
 
 #endif

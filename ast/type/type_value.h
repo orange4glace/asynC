@@ -18,6 +18,7 @@ struct TypeValue {
   SymbolTable *local_symbol_table;
 
   virtual TypeValue* ExecuteOperator(Operator op, TypeValue* rhs) = 0;
+  virtual TypeValue* ExecuteOperator(Operator op) = 0;
 
   virtual Type type() = 0;
 

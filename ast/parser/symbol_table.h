@@ -18,7 +18,7 @@ extern SymbolTable *symbol_table;
 
 struct TableCompare {
   inline bool operator()(Identifier* const& lhs, Identifier* const& rhs) const {
-    return lhs->id.compare(rhs->id);
+    return lhs->id.compare(rhs->id) < 0;
   }
 };
 
@@ -74,7 +74,7 @@ struct SymbolTable {
 
   inline int GetTypeValueOffset(TypeValue *type_value) {
     if (type_value->local_symbol_table == this) return -type_value->stack_frame_offset;
-    return parent->GetTypeValueOffset(type_value) + parent->stack_frame_size;
+    return parent->GetTypeValueOffset(type_value) + parent->stack_frame_size + (1 /* push ebp */ );
   }
 
   inline void Push() {

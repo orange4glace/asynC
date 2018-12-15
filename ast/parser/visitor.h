@@ -139,6 +139,13 @@ struct Visitor {
     type_value = lhs->ExecuteOperator(node->op, rhs);
   }
 
+  void Visit(UnaryExpressionNode *node) {
+    type_value = nullptr;
+    node->lhs->Accept(this);
+    TypeValue *lhs = type_value;
+    type_value = lhs->ExecuteOperator(node->op);
+  }
+
   void Visit(ConstantExpressionNode *node) {
     type_value = node->type_value;
     symbol_table->PushStackFrameBack(type_value);

@@ -10,6 +10,16 @@ enum class Operator : int {
   MULTIPLICATION,
   DIVISION,
   MODULAR,
+  INCREMENT,
+  DECREMENT,
+  LEFT_SHIFT,
+  RIGHT_SHIFT,
+  EQUAL,
+  NOT_EQUAL,
+  GREATER,
+  GREATER_EQUAL,
+  LESS,
+  LESS_EQUAL,
 };
 
 inline extern std::string OperatorToString(Operator op) {
@@ -20,6 +30,16 @@ inline extern std::string OperatorToString(Operator op) {
   case Operator::MULTIPLICATION: return "MULTIPLICATION";
   case Operator::DIVISION: return "DIVISION";
   case Operator::MODULAR: return "MODULAR";
+  case Operator::INCREMENT: return "INCREMENT";
+  case Operator::DECREMENT: return "DECREMENT";
+  case Operator::LEFT_SHIFT: return "LEFT_SHIFT";
+  case Operator::RIGHT_SHIFT: return "RIGHT_SHIFT";
+  case Operator::EQUAL: return "EQUAL";
+  case Operator::NOT_EQUAL: return "NOT_EQUAL";
+  case Operator::GREATER: return "GREATER";
+  case Operator::GREATER_EQUAL: return "GREATER_EQUAL";
+  case Operator::LESS: return "LESS";
+  case Operator::LESS_EQUAL: return "LESS_EQUAL";
   default: return "UNKNOWN";
   }
 }

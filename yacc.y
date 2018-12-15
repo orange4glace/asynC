@@ -137,17 +137,11 @@ variable_capture
 
 postfix_expression
   : primary_expression
-  {
-    $$ = $1;
-  }
+  { $$ = $1; }
   | postfix_expression '[' expression ']'
-  {
-    $$ = new ArrayExpressionNode($1, $3);
-  }
+  { $$ = new ArrayExpressionNode($1, $3); }
   | postfix_expression '(' argument_expression_list ')'
-  {
-    $$ = new FunctionCallExpressionNode($1, $3);
-  }
+  { $$ = new FunctionCallExpressionNode($1, $3); }
   ;
 
 argument_expression_list
@@ -164,9 +158,12 @@ argument_expression_list
 
 unary_expression
   : postfix_expression
+  { $$ = $1; }
   | INC_OP unary_expression
+  { $$ = new UnaryExpressionNode(Operator::INCREMENT, $2); }
   | DEC_OP unary_expression
-  | unary_operator cast_expression
+  { $$ = new UnaryExpressionNode(Operator::DECREMENT, $2); }
+//| unary_operator cast_expression
   ;
 
 unary_operator
@@ -179,8 +176,7 @@ unary_operator
   ;
 
 cast_expression
-//: unary_expression
-  : postfix_expression
+  : unary_expression
   {
     $$ = $1;
   }
@@ -231,11 +227,11 @@ shift_expression
   }
   | shift_expression LEFT_OP additive_expression
   {
-    $$ = new InclusiveORExpressionNode($1, $3);
+    $$ = new BinaryExpressionNode(Operator::LEFT_SHIFT, $1, $3);
   }
   | shift_expression RIGHT_OP additive_expression
   {
-    $$ = new InclusiveORExpressionNode($1, $3);
+    $$ = new BinaryExpressionNode(Operator::RIGHT_SHIFT, $1, $3);
   }
   ;
 
@@ -246,19 +242,19 @@ relational_expression
   }
   | relational_expression '<' shift_expression
   {
-    $$ = new InclusiveORExpressionNode($1, $3);
+    $$ = new BinaryExpressionNode(Operator::LESS, $1, $3);
   }
   | relational_expression '>' shift_expression
   {
-    $$ = new InclusiveORExpressionNode($1, $3);
+    $$ = new BinaryExpressionNode(Operator::GREATER, $1, $3);
   }
   | relational_expression LE_OP shift_expression
   {
-    $$ = new InclusiveORExpressionNode($1, $3);
+    $$ = new BinaryExpressionNode(Operator::LESS_EQUAL, $1, $3);
   }
   | relational_expression GE_OP shift_expression
   {
-    $$ = new InclusiveORExpressionNode($1, $3);
+    $$ = new BinaryExpressionNode(Operator::GREATER_EQUAL, $1, $3);
   }
   ;
 
@@ -269,11 +265,11 @@ equality_expression
   }
   | equality_expression EQ_OP relational_expression
   {
-    $$ = new InclusiveORExpressionNode($1, $3);
+    $$ = new BinaryExpressionNode(Operator::EQUAL, $1, $3);
   }
   | equality_expression NE_OP relational_expression
   {
-    $$ = new InclusiveORExpressionNode($1, $3);
+    $$ = new BinaryExpressionNode(Operator::NOT_EQUAL, $1, $3);
   }
   ;
 
@@ -345,7 +341,7 @@ conditional_expression
 
 assignment_expression
 //: conditional_expression
-  : additive_expression
+  : equality_expression
   {
     $$ = $1;
   }
