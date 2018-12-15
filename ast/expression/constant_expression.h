@@ -5,20 +5,19 @@
 #include "ast/type/integer.h"
 
 struct ConstantExpressionNode : ExpressionNode {
-  Integer *type_value_;
 
   ConstantExpressionNode(int val) {
-    type_value_ = new Integer();
-    type_value_->value = val;
-  }
-
-  inline Integer* type_value() {
-    return type_value_;
+    Integer *integer = new Integer();
+    integer->value = val;
+    type_value = integer;
   }
       
   inline void Print() override {
     indent();
-    cout << "[Constant] " << type_value_->value << "\n";
+    cout << "[Constant]\n";
+    ii();
+    type_value->Print(cout);
+    di();
   }
 
   void Accept(Visitor* visitor) override;

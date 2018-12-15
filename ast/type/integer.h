@@ -9,16 +9,14 @@ struct Integer : TypeValueBase<Integer> {
 
   inline static void Initialize() {
     Integer::AddOperatorFunction(
-      TypePair(ADDITION, Integer::_type(), Integer::_type()),
+      TypePair(Operator::ADDITION, Integer::_type(), Integer::_type()),
       [](TypeValue* l, TypeValue* r) -> TypeValue* {
         Integer* lhs = static_cast<Integer*>(l);
         Integer* rhs = static_cast<Integer*>(r);
-        Integer* res = new Integer();
-        res->value = lhs->value + rhs->value;
 
+        Integer* res = new Integer();
         // Code generation
         symbol_table->PushStackFrameBack(res);
-        res->stack_frame_offset = symbol_table->PushStackFrameBack();
         symbol_table->AppendCode("sss",
             "mov", res->GetStackFrameAddress(), l->GetStackFrameAddress());
         symbol_table->AppendCode("sss",
@@ -28,7 +26,24 @@ struct Integer : TypeValueBase<Integer> {
       }
     );
     Integer::AddOperatorFunction(
-      TypePair(ASSIGNMENT, Integer::_type(), Integer::_type()),
+      TypePair(Operator::SUBTRACTION, Integer::_type(), Integer::_type()),
+      [](TypeValue* l, TypeValue* r) -> TypeValue* {
+        Integer* lhs = static_cast<Integer*>(l);
+        Integer* rhs = static_cast<Integer*>(r);
+
+        Integer* res = new Integer();
+        // Code generation
+        symbol_table->PushStackFrameBack(res);
+        symbol_table->AppendCode("sss",
+            "mov", res->GetStackFrameAddress(), l->GetStackFrameAddress());
+        symbol_table->AppendCode("sss",
+            "sub", res->GetStackFrameAddress(), r->GetStackFrameAddress());
+
+        return res;
+      }
+    );
+    Integer::AddOperatorFunction(
+      TypePair(Operator::ASSIGNMENT, Integer::_type(), Integer::_type()),
       [](TypeValue* l, TypeValue* r) -> TypeValue* {
         Integer* lhs = static_cast<Integer*>(l);
         Integer* rhs = static_cast<Integer*>(r);
@@ -43,8 +58,11 @@ struct Integer : TypeValueBase<Integer> {
     );
   }
 
+  void PushStackFrameBack(SymbolTable *symbol_table) override;
+
   void Print(std::ostream& str) const override {
-    str << "[Integer] " << value;
+    indent();
+    str << "[Integer] " << value << "\n";
   }
 
   static inline Type _type() {

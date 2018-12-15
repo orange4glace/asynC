@@ -56,7 +56,7 @@ void yyerror(char * s);
     argument_expression_list constant_expression async_expression
     variable_capture_list variable_capture
 %type <statement> statement expression_statement compound_statement selection_statement iteration_statement
-    return_statement
+    return_statement print_statement
 %type <function_definition> function_definition
 %type <parameter_declaration> parameter_declaration_list parameter_declaration
 %type <type_name> type_name
@@ -75,7 +75,7 @@ void yyerror(char * s);
 %token CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE CONST VOLATILE VOID ASYNC
 %token STRUCT UNION ENUM ELLIPSIS
 
-%token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
+%token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN PRINT
 
 %start translation_unit
 %%
@@ -197,15 +197,15 @@ multiplicative_expression
   }
   | multiplicative_expression '*' cast_expression
   {
-    $$ = new AdditionExpressionNode($1, $3);
+    $$ = new BinaryExpressionNode(Operator::MULTIPLICATION, $1, $3);
   }
   | multiplicative_expression '/' cast_expression
   {
-    $$ = new AdditionExpressionNode($1, $3);
+    $$ = new BinaryExpressionNode(Operator::DIVISION, $1, $3);
   }
   | multiplicative_expression '%' cast_expression
   {
-    $$ = new AdditionExpressionNode($1, $3);
+    $$ = new BinaryExpressionNode(Operator::MODULAR, $1, $3);
   }
   ;
 
@@ -216,11 +216,11 @@ additive_expression
   }
   | additive_expression '+' multiplicative_expression
   {
-    $$ = new AdditionExpressionNode($1, $3);
+    $$ = new BinaryExpressionNode(Operator::ADDITION, $1, $3);
   }
   | additive_expression '-' multiplicative_expression
   {
-    $$ = new SubtractionExpressionNode($1, $3);
+    $$ = new BinaryExpressionNode(Operator::SUBTRACTION, $1, $3);
   }
   ;
 
@@ -476,6 +476,7 @@ statement
   | iteration_statement { $$ = $1; }
   | selection_statement { $$ = $1; }
   | return_statement { $$ = $1; }
+  | print_statement { $$ = $1; }
   | expression_statement { $$ = $1; }
   ;
 
@@ -572,6 +573,12 @@ return_statement
   }
   ;
 
+print_statement
+  : PRINT expression ';'
+  {
+    $$ = new PrintStatementNode($2);
+  }
+
 external_declaration 
   : declaration
   {
@@ -582,6 +589,8 @@ external_declaration
   | function_definition
   {
     $1->Print();
+    visitor->Visit($1);
+    symbol_table->PrintCode();
   }
   ;
 

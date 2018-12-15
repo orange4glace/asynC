@@ -13,6 +13,9 @@
 
 using namespace std;
 
+struct SymbolTable;
+extern SymbolTable *symbol_table;
+
 struct TableCompare {
   inline bool operator()(Identifier* const& lhs, Identifier* const& rhs) const {
     return lhs->id.compare(rhs->id);
@@ -34,6 +37,7 @@ struct SymbolTable {
 
   inline SymbolTable(SymbolTable *p) {
     parent = p;
+    stack_frame_size = 0;
   }
   
   inline void AddSymbol(Identifier *id, TypeValue *tv) {
@@ -53,33 +57,42 @@ struct SymbolTable {
     return parent->GetSymbol(identifier);
   }
 
-  inline void PushStackFrameBack(Identifier *identifier) {
-    assert(table.count(identifier));
-    SymbolTableEntry *entry = table[identifier];
-    AppendCode("sd", "push", 0);
-    entry->type_value->stack_frame_offset = stack_frame_size++;
-  }
-
   inline void PushStackFrameBack(TypeValue* type_value) {
-    AppendCode("sd", "push", 0);
-    type_value->local_symbol_table = this;
-    type_value->stack_frame_offset = stack_frame_size++;
+    type_value->PushStackFrameBack(this);
   }
 
   inline int PushStackFrameBack() {
     AppendCode("sd", "push", 0);
-    return stack_frame_size++;
+    return ++stack_frame_size;
   }
 
   inline int GetSymbolOffset(Identifier *identifier) {
     assert(HasSymbol(identifier));
-    if (table.count(identifier)) return table[identifier]->type_value->stack_frame_offset;
-    return parent->GetSymbolOffset(identifier) - parent->stack_frame_size;
+    if (table.count(identifier)) return -table[identifier]->type_value->stack_frame_offset;
+    return parent->GetSymbolOffset(identifier) + parent->stack_frame_size;
   }
 
   inline int GetTypeValueOffset(TypeValue *type_value) {
-    if (type_value->local_symbol_table == this) return type_value->stack_frame_offset;
-    return parent->GetTypeValueOffset(type_value) - parent->stack_frame_size;
+    if (type_value->local_symbol_table == this) return -type_value->stack_frame_offset;
+    return parent->GetTypeValueOffset(type_value) + parent->stack_frame_size;
+  }
+
+  inline void Push() {
+    symbol_table->AppendCode("ss", "push", "ebp");
+    symbol_table->AppendCode("sss", "mov", "ebp", "esp");
+    SymbolTable *next = new SymbolTable(this);
+    symbol_table = next;
+  }
+
+  inline void Pop() {
+    symbol_table->AppendCode("ss", "pop", "ebp");
+    for (auto& code : this->code)
+      this->parent->code.emplace_back(code);
+    symbol_table = this->parent;
+  }
+
+  inline void ClearStackFrame() {
+    symbol_table->AppendCode("ssd", "add", "esp", symbol_table->stack_frame_size * 4);
   }
 
   inline void AppendCode(const char* fmt...) {
@@ -109,7 +122,5 @@ struct SymbolTable {
   }
 
 };
-
-extern SymbolTable *symbol_table;
 
 #endif

@@ -28,6 +28,7 @@ struct TypeValue {
   }
 
   const char* GetStackFrameAddress();
+  virtual inline void PushStackFrameBack(SymbolTable *symbol_table) {};
 
 };
 

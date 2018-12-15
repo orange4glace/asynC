@@ -72,14 +72,13 @@ struct Visitor {
     symbol_table->PushStackFrameBack(declarator_type_value);
     if (!node->initializer) {
       symbol_table->AddSymbol(declarator_identifier, type_value);
-      symbol_table->PushStackFrameBack(declarator_identifier);
       indent();
       cout << "(InitDeclarator) AddSymbol " << declarator_identifier->id << " " << *type_value << "\n";
       return;
     }
     node->initializer->Accept(this);
     TypeValue* initializer_type_value = type_value;
-    type_value = declarator_type_value->ExecuteOperator(ASSIGNMENT, initializer_type_value);
+    type_value = declarator_type_value->ExecuteOperator(Operator::ASSIGNMENT, initializer_type_value);
     symbol_table->AddSymbol(declarator_identifier, type_value);
     indent();
     cout << "(InitDeclarator) AddSymbol " << declarator_identifier->id << " " << *type_value << "\n";
@@ -119,7 +118,7 @@ struct Visitor {
     TypeValue *rhs = type_value;
     node->lhs->Accept(this);
     TypeValue *lhs = type_value;
-    lhs->ExecuteOperator(ASSIGNMENT, rhs);
+    lhs->ExecuteOperator(Operator::ASSIGNMENT, rhs);
     type_value = lhs;
     indent();
     cout << *type_value << endl;
@@ -131,17 +130,17 @@ struct Visitor {
     type_value = symbol_table->GetSymbol(identifier);
   }
 
-  void Visit(AdditionExpressionNode *node) {
+  void Visit(BinaryExpressionNode *node) {
     type_value = nullptr;
     node->rhs->Accept(this);
     TypeValue *rhs = type_value;
     node->lhs->Accept(this);
     TypeValue *lhs = type_value;
-    type_value = lhs->ExecuteOperator(ADDITION, rhs);
+    type_value = lhs->ExecuteOperator(node->op, rhs);
   }
 
   void Visit(ConstantExpressionNode *node) {
-    type_value = node->type_value();
+    type_value = node->type_value;
     symbol_table->PushStackFrameBack(type_value);
   }
 
@@ -180,7 +179,29 @@ struct Visitor {
   }
 
   void Visit(CompoundStatementNode *node) {
-    statement = node;
+    Node *node_list = node->node_list;
+    while (node_list) {
+      node_list->Accept(this);
+      node_list = node_list->next;
+    }
+  }
+
+  void Visit(IterationStatementNode *node) {
+    symbol_table->Push();
+    symbol_table->AppendCode("s", "loop_start:");
+    node->cond->Accept(this);
+    symbol_table->AppendCode("ssd", "cmp", type_value->GetStackFrameAddress(), 0);
+    symbol_table->AppendCode("ss", "je", "loop_end");
+    node->stmt->Accept(this);
+    symbol_table->ClearStackFrame();
+    symbol_table->AppendCode("ss", "jmp", "loop_start");
+    symbol_table->AppendCode("s", "loop_end:");
+    symbol_table->Pop();
+  }
+
+  void Visit(PrintStatementNode *node) {
+    node->expression->Accept(this);
+    symbol_table->AppendCode("ss", "prn", type_value->GetStackFrameAddress());
   }
 
 };

@@ -52,6 +52,7 @@ int comment();
 "void"      { count(); return(VOID); }
 "volatile"    { count(); return(VOLATILE); }
 "while"     { count(); return(WHILE); }
+"print"     { count(); return(PRINT); }
 
 {L}({L}|{D})*   { count(); return(check_type()); }
 

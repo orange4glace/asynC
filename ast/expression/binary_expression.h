@@ -2,24 +2,29 @@
 #define BINARY_EXPRESSION_H_
 
 #include "expression.h"
+#include "ast/operator.h"
 
 struct BinaryExpressionNode : ExpressionNode {
   ExpressionNode *lhs;
   ExpressionNode *rhs;
+  Operator op;
   
-  inline BinaryExpressionNode(ExpressionNode *lhs, ExpressionNode *rhs) {
+  inline BinaryExpressionNode(Operator op, ExpressionNode *lhs, ExpressionNode *rhs) {
+    this->op = op;
     this->lhs = lhs;
     this->rhs = rhs;
   }
+
   inline void Print() override {
     indent();
-    cout << "[" << name() << "]\n";
+    cout << "[" << OperatorToString(op) << "]\n";
     ii();
     lhs->Print();
     rhs->Print();
     di();
   }
-  virtual string name() = 0;
+
+  void Accept(Visitor* visitor) override;
 };
 
 #endif

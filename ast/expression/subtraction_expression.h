@@ -6,7 +6,7 @@
 struct SubtractionExpressionNode : BinaryExpressionNode {
   
   inline SubtractionExpressionNode(ExpressionNode *lhs, ExpressionNode *rhs)
-      : BinaryExpressionNode(lhs, rhs) {}
+      : BinaryExpressionNode(SUBTRACTION, lhs, rhs) {}
       
   inline string name() override {
     return "Subtraction";

@@ -17,8 +17,8 @@ struct IterationStatementNode : StatementNode {
   StatementNode *stmt;
 
   inline IterationStatementNode(ExpressionNode *cond, StatementNode *stmt) {
-      this->cond = cond;
-      this->stmt = stmt;
+    this->cond = cond;
+    this->stmt = stmt;
   }
 
   inline void Print() override {
