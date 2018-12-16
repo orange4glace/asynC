@@ -7,6 +7,12 @@
 struct Integer : TypeValueBase<Integer> {
   int value;
 
+  TypeValue* Clone() override {
+    Integer *type_value = new Integer();
+    type_value->value = this->value;
+    return type_value;
+  }
+
   inline static void Initialize() {
     Integer::AddOperatorFunction(
       TypePair(Operator::ASSIGNMENT, Integer::_type(), Integer::_type()),

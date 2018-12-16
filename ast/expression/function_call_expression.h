@@ -1,6 +1,7 @@
 #ifndef FUNCTION_CALL_EXPRESSION_H_
 #define FUNCTION_CALL_EXPRESSION_H_
 
+#include "ast/identifier.h"
 #include "ast/expression/expression.h"
 
 struct FunctionCallExpressionNode : ExpressionNode {
@@ -8,7 +9,9 @@ struct FunctionCallExpressionNode : ExpressionNode {
   ExpressionNode* argument_expression_list;
   
   inline FunctionCallExpressionNode(ExpressionNode* fn_id, ExpressionNode* arg_exp_list)
-      : identifier(fn_id), argument_expression_list(arg_exp_list) {}
+      : identifier(fn_id), argument_expression_list(arg_exp_list) {
+    assert(dynamic_cast<IdentifierExpressionNode*>(identifier));
+  }
 
   inline void Print() override {
     indent();

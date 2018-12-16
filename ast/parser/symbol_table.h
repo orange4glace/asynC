@@ -24,20 +24,21 @@ struct TableCompare {
 
 struct SymbolTable {
 
+  string name;
   SymbolTable *parent;
   map<Identifier*, SymbolTableEntry*, TableCompare> table;
   vector<string> code;
 
   int stack_frame_size;
 
-  inline SymbolTable() {
+  inline SymbolTable(string name) {
     parent = nullptr;
+    this->name = name;
     stack_frame_size = 0;
   }
 
-  inline SymbolTable(SymbolTable *p) {
+  inline SymbolTable(string name, SymbolTable *p) : SymbolTable(name) {
     parent = p;
-    stack_frame_size = 0;
   }
   
   inline void AddSymbol(Identifier *id, TypeValue *tv) {
@@ -57,8 +58,18 @@ struct SymbolTable {
     return parent->GetSymbol(identifier);
   }
 
+  inline SymbolTable* GetLocalSymbolTable(Identifier *identifier) {
+    if (table.count(identifier)) return this;
+    assert(parent != nullptr);
+    return parent->GetLocalSymbolTable(identifier);
+  }
+
   inline void PushStackFrameBack(TypeValue* type_value) {
-    type_value->PushStackFrameBack(this);
+    if (type_value->local_symbol_table) {
+      symbol_table->AppendCode("ss", "push", type_value->GetStackFrameAddress());
+      ++symbol_table->stack_frame_size;
+    }
+    else type_value->PushStackFrameBack(this);
   }
 
   inline int PushStackFrameBack() {
@@ -77,22 +88,35 @@ struct SymbolTable {
     return parent->GetTypeValueOffset(type_value) + parent->stack_frame_size + (1 /* push ebp */ );
   }
 
-  inline void Push() {
-    symbol_table->AppendCode("ss", "push", "ebp");
-    symbol_table->AppendCode("sss", "mov", "ebp", "esp");
-    SymbolTable *next = new SymbolTable(this);
+  inline SymbolTable* Push(string name) {
+    SymbolTable *next = new SymbolTable(name, this);
     symbol_table = next;
+    return symbol_table;
   }
 
   inline void Pop() {
-    symbol_table->AppendCode("ss", "pop", "ebp");
     for (auto& code : this->code)
       this->parent->code.emplace_back(code);
     symbol_table = this->parent;
   }
 
+  inline void SaveBasePointer() {
+    symbol_table->AppendCode("ss", "push", "ebp");
+    symbol_table->AppendCode("sss", "mov", "ebp", "esp");
+  }
+
+  inline void RestoreBasePointer() {
+    symbol_table->AppendCode("ss", "pop", "ebp");
+  }
+
+  inline void FunctionReturn() {
+    ClearStackFrame();
+    symbol_table->AppendCode("ss", "pop", "ebp");
+    symbol_table->AppendCode("s", "ret");
+  }
+
   inline void ClearStackFrame() {
-    symbol_table->AppendCode("ssd", "add", "esp", symbol_table->stack_frame_size * 4);
+    symbol_table->AppendCode("ssdss", "add", "esp", stack_frame_size * 4, "//",name.c_str());
   }
 
   inline void AppendCode(const char* fmt...) {

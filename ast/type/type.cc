@@ -1,6 +1,7 @@
 #include "ast/parser/symbol_table.h"
 #include "ast/type/type_value.h"
 #include "ast/type/integer.h"
+#include "ast/type/void.h"
 
 const char* TypeValue::GetStackFrameAddress() {
   int off = symbol_table->GetTypeValueOffset(this);
@@ -11,6 +12,12 @@ const char* TypeValue::GetStackFrameAddress() {
 
 void Integer::PushStackFrameBack(SymbolTable *symbol_table) {
   symbol_table->AppendCode("sd", "push", this->value);
+  this->local_symbol_table = symbol_table;
+  this->stack_frame_offset = ++symbol_table->stack_frame_size;
+}
+
+void Void::PushStackFrameBack(SymbolTable *symbol_table) {
+  symbol_table->AppendCode("sd", "push", 0);
   this->local_symbol_table = symbol_table;
   this->stack_frame_offset = ++symbol_table->stack_frame_size;
 }

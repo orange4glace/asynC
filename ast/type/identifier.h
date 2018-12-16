@@ -15,6 +15,10 @@ struct Identifier {
     id = identifier_node->id;
   }
 
+  Identifier(string id) {
+    this->id = id;
+  }
+
 };
 
 #endif

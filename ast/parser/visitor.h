@@ -151,38 +151,89 @@ struct Visitor {
     symbol_table->PushStackFrameBack(type_value);
   }
 
+  void Visit(FunctionCallExpressionNode *node) {
+    node->identifier->Accept(this);
+    Function *function = dynamic_cast<Function*>(symbol_table->GetSymbol(identifier));
+    assert(function);
+    TypeValue *return_type_value = function->return_type_value->Clone();
+    assert(return_type_value);
+    vector<TypeValue*> arg_list;
+    Node *arg = node->argument_expression_list;
+    while (arg) {
+      arg->Accept(this);
+      arg_list.push_back(type_value);
+      arg = arg->next;
+    }
+    symbol_table->PushStackFrameBack(return_type_value);
+    for (auto& arg : arg_list)
+      symbol_table->PushStackFrameBack(arg);
+    symbol_table->AppendCode("ss", "call", function->identifier->id.c_str());
+    type_value = return_type_value;
+  }
+
   void Visit(FunctionDefinitionNode *node) {
     Function* function = new Function();
     node->type_specifier->Accept(this);
-    TypeValue *return_type = type_value;
+    TypeValue *return_type = function->return_type_value = type_value;
     node->declarator->Accept(this);
-    Identifier *function_identifier = identifier;
+    Identifier *function_identifier = function->identifier = identifier;
     ParameterDeclarationNode *pdecl = node->parameter_declaration_list;
-    SymbolTable *fn_symbol_table = new SymbolTable(symbol_table);
+    symbol_table->AddSymbol(function_identifier, function);
+
+    // label
+    symbol_table->AppendCode("s", string(function_identifier->id + ":").c_str());
+    symbol_table->SaveBasePointer();
+    symbol_table->Push("Function " + function_identifier->id);
+
+    int pdecl_offset = 2;
     while (pdecl) {
       pdecl->Accept(this);
       Identifier *fn_parameter_identifier = identifier;
       TypeValue *fn_parameter_type_value = type_value;
       FunctionParameter *fn_parameter =
           new FunctionParameter(fn_parameter_identifier, fn_parameter_type_value);
-      fn_symbol_table->AddSymbol(fn_parameter_identifier, fn_parameter_type_value);
+      fn_parameter_type_value->local_symbol_table = symbol_table;
+      fn_parameter_type_value->stack_frame_offset = -pdecl_offset++;
+      symbol_table->AddSymbol(fn_parameter_identifier, fn_parameter_type_value);
       function->parameters.push_back(fn_parameter);
       pdecl = static_cast<ParameterDeclarationNode*>(pdecl->next);
     }
+
+    // return value
+    Identifier *return_identifier = new Identifier("return");
+    symbol_table->AddSymbol(return_identifier, return_type);
+    return_type->local_symbol_table = symbol_table;
+    return_type->stack_frame_offset = -pdecl_offset++;
+    
     node->compound_statement->Accept(this);
     CompoundStatementNode *function_compound_statement 
         = static_cast<CompoundStatementNode*>(statement);
-        
-    SymbolTable *saved_symbol_table = symbol_table;
-    symbol_table = fn_symbol_table;
 
-  
-
-    symbol_table = saved_symbol_table;
+    symbol_table->Pop();
   }
 
   void Visit(ParameterDeclarationNode *node) {
+    node->type_specifier->Accept(this);
+    node->declarator->Accept(this);
+  }
 
+  void Visit(ReturnStatementNode *node) {
+    if (node->expression) {
+      node->expression->Accept(this);
+      TypeValue *return_value = type_value;
+      TypeValue *return_value_address = symbol_table->GetSymbol(new Identifier("return"));
+      assert(return_value_address);
+      symbol_table->AppendCode("sss", "mov",
+          return_value_address->GetStackFrameAddress(), return_value->GetStackFrameAddress());
+    }
+    SymbolTable *return_symbol_table = symbol_table->GetLocalSymbolTable(new Identifier("return"));
+    SymbolTable *target_symbol_table = symbol_table;
+    while (target_symbol_table != return_symbol_table) {
+      target_symbol_table->ClearStackFrame();
+      target_symbol_table->RestoreBasePointer();
+      target_symbol_table = target_symbol_table->parent;
+    }
+    return_symbol_table->FunctionReturn();
   }
 
   void Visit(CompoundStatementNode *node) {
@@ -194,7 +245,8 @@ struct Visitor {
   }
 
   void Visit(IterationStatementNode *node) {
-    symbol_table->Push();
+    symbol_table->SaveBasePointer();
+    symbol_table->Push("Iteration");
     symbol_table->AppendCode("s", "loop_start:");
     node->cond->Accept(this);
     symbol_table->AppendCode("ssd", "cmp", type_value->GetStackFrameAddress(), 0);
@@ -203,7 +255,33 @@ struct Visitor {
     symbol_table->ClearStackFrame();
     symbol_table->AppendCode("ss", "jmp", "loop_start");
     symbol_table->AppendCode("s", "loop_end:");
+    symbol_table->RestoreBasePointer();
     symbol_table->Pop();
+  }
+
+  void Visit(SelectionStatementNode *node) {
+    node->cond->Accept(this);
+    symbol_table->AppendCode("ssd", "cmp", type_value->GetStackFrameAddress(), 0);
+    symbol_table->AppendCode("ss", "je", "else_start");
+
+    // if
+    symbol_table->SaveBasePointer();
+    symbol_table->Push("Selection If");
+    node->stmt1->Accept(this);
+    symbol_table->ClearStackFrame();
+    symbol_table->RestoreBasePointer();
+    symbol_table->Pop();
+    symbol_table->AppendCode("ss", "jump", "if_end");
+    
+    // else
+    symbol_table->AppendCode("s", "else_start:");
+    symbol_table->SaveBasePointer();
+    symbol_table->Push("Selection Else");
+    if (node->stmt2) node->stmt2->Accept(this);
+    symbol_table->ClearStackFrame();
+    symbol_table->RestoreBasePointer();
+    symbol_table->Pop();
+    symbol_table->AppendCode("s", "if_end:");
   }
 
   void Visit(PrintStatementNode *node) {

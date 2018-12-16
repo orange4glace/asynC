@@ -2,14 +2,21 @@
 #define FUNCTION_H_
 
 #include "ast/type/type_value_base.h"
+#include "ast/identifier.h"
 #include "ast/type/function_parameter.h"
 
 #include <vector>
 
 struct Function : TypeValueBase<Function> {
 
-  TypeValue* return_type_value;
+  Identifier *identifier;
+  TypeValue *return_type_value;
   vector<FunctionParameter*> parameters;
+
+  TypeValue* Clone() override {
+    assert(false);
+    return nullptr;
+  }
 
   void Print(std::ostream& str) const override {
     indent();

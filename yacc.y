@@ -142,6 +142,8 @@ postfix_expression
   { $$ = new ArrayExpressionNode($1, $3); }
   | postfix_expression '(' argument_expression_list ')'
   { $$ = new FunctionCallExpressionNode($1, $3); }
+  | postfix_expression '(' ')'
+  { $$ = new FunctionCallExpressionNode($1, nullptr); }
   ;
 
 argument_expression_list
@@ -566,6 +568,10 @@ return_statement
   : RETURN expression ';'
   {
     $$ = new ReturnStatementNode($2);
+  }
+  | RETURN ';'
+  {
+    $$ = new ReturnStatementNode();
   }
   ;
 

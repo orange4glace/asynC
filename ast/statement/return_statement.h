@@ -7,6 +7,10 @@ struct ReturnStatementNode : StatementNode {
 
   ExpressionNode *expression;
 
+  inline ReturnStatementNode()
+    : expression(nullptr) {
+  }
+
   inline ReturnStatementNode(ExpressionNode *exp)
     : expression(exp) {
   }
@@ -15,7 +19,8 @@ struct ReturnStatementNode : StatementNode {
     indent();
     cout << "[ReturnStatement]\n";
     ii();
-    expression->Print();
+    if (expression)
+      expression->Print();
     di();
   }
 

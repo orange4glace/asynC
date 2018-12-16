@@ -4,6 +4,7 @@
 #include "type_value.h"
 #include "type.h"
 #include "integer.h"
+#include "void.h"
 
 struct TypeValueFactory {
 
@@ -11,6 +12,8 @@ struct TypeValueFactory {
     switch (type) {
     case Type::INTEGER:
       return new Integer();
+    case Type::VOID:
+      return new Void();
     }
     return nullptr;
   }

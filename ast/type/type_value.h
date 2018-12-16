@@ -17,6 +17,10 @@ struct TypeValue {
   int stack_frame_offset;
   SymbolTable *local_symbol_table;
 
+  inline TypeValue() : local_symbol_table(nullptr) {}
+
+  virtual TypeValue* Clone() = 0;
+
   virtual TypeValue* ExecuteOperator(Operator op, TypeValue* rhs) = 0;
   virtual TypeValue* ExecuteOperator(Operator op) = 0;
 
