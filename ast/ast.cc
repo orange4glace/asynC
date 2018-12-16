@@ -24,7 +24,10 @@ void indent() {
 void ii() { indent_count++; }
 void di() { indent_count--; }
 
+int global_id = 0;
+
 void init_ast() {
+  Void::Initialize();
   Integer::Initialize();
 }
 

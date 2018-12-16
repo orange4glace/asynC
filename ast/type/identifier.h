@@ -11,12 +11,16 @@ struct Identifier {
 
   string id;
 
-  Identifier(IdentifierNode *identifier_node) {
+  inline Identifier(IdentifierNode *identifier_node) {
     id = identifier_node->id;
   }
 
-  Identifier(string id) {
+  inline Identifier(string id) {
     this->id = id;
+  }
+
+  static inline Type _type() {
+    return Type::IDENTIFIER;
   }
 
 };

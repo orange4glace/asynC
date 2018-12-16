@@ -12,8 +12,11 @@ struct Visitor;
 
 struct Node {
   Node* next;
+  int id;
 
-  Node() : next(nullptr) {}
+  Node() : next(nullptr) {
+    id = global_id++;
+  }
 
   virtual void Print() = 0;
 

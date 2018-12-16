@@ -25,6 +25,7 @@ struct TableCompare {
 struct SymbolTable {
 
   string name;
+  int id;
   SymbolTable *parent;
   map<Identifier*, SymbolTableEntry*, TableCompare> table;
   vector<string> code;
@@ -35,6 +36,7 @@ struct SymbolTable {
     parent = nullptr;
     this->name = name;
     stack_frame_size = 0;
+    this->id = global_id++;
   }
 
   inline SymbolTable(string name, SymbolTable *p) : SymbolTable(name) {
@@ -101,12 +103,12 @@ struct SymbolTable {
   }
 
   inline void SaveBasePointer() {
-    symbol_table->AppendCode("ss", "push", "ebp");
+    symbol_table->AppendCode("sssd", "push", "ebp", "# save base pointer", id);
     symbol_table->AppendCode("sss", "mov", "ebp", "esp");
   }
 
   inline void RestoreBasePointer() {
-    symbol_table->AppendCode("ss", "pop", "ebp");
+    symbol_table->AppendCode("sssd", "pop", "ebp", "# restore base pointer", symbol_table->parent->id);
   }
 
   inline void FunctionReturn() {
@@ -116,7 +118,7 @@ struct SymbolTable {
   }
 
   inline void ClearStackFrame() {
-    symbol_table->AppendCode("ssdss", "add", "esp", stack_frame_size * 4, "//",name.c_str());
+    symbol_table->AppendCode("ssd", "add", "esp", stack_frame_size * 4);
   }
 
   inline void AppendCode(const char* fmt...) {

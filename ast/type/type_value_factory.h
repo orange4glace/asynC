@@ -5,6 +5,7 @@
 #include "type.h"
 #include "integer.h"
 #include "void.h"
+#include "array.h"
 
 struct TypeValueFactory {
 
