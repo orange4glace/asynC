@@ -12,6 +12,8 @@ enum class Operator : int {
   MODULAR,
   INCREMENT,
   DECREMENT,
+  POSTFIX_INCREMENT,
+  POSTFIX_DECREMENT,
   LEFT_SHIFT,
   RIGHT_SHIFT,
   EQUAL,
@@ -32,6 +34,8 @@ inline extern std::string OperatorToString(Operator op) {
   case Operator::MODULAR: return "MODULAR";
   case Operator::INCREMENT: return "INCREMENT";
   case Operator::DECREMENT: return "DECREMENT";
+  case Operator::POSTFIX_INCREMENT: return "POSTFIX_INCREMENT";
+  case Operator::POSTFIX_DECREMENT: return "POSTFIX_DECREMENT";
   case Operator::LEFT_SHIFT: return "LEFT_SHIFT";
   case Operator::RIGHT_SHIFT: return "RIGHT_SHIFT";
   case Operator::EQUAL: return "EQUAL";

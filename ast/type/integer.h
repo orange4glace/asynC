@@ -239,6 +239,38 @@ struct Integer : TypeValueBase<Integer> {
         return lhs;
       }
     );
+    Integer::AddOperatorFunction(
+      TypeSingle(Operator::POSTFIX_INCREMENT, Integer::_type()),
+      [](TypeValue* l) -> TypeValue* {
+        Integer* lhs = static_cast<Integer*>(l);
+
+        Integer *res = new Integer();
+        // Code generation
+        symbol_table->PushStackFrameBack(res);
+        symbol_table->AppendCode("sss",
+            "mov", res->GetStackFrameAddress(), l->GetStackFrameAddress());
+        symbol_table->AppendCode("ssd",
+            "add", l->GetStackFrameAddress(), 1);
+
+        return res;
+      }
+    );
+    Integer::AddOperatorFunction(
+      TypeSingle(Operator::POSTFIX_DECREMENT, Integer::_type()),
+      [](TypeValue* l) -> TypeValue* {
+        Integer* lhs = static_cast<Integer*>(l);
+
+        Integer *res = new Integer();
+        // Code generation
+        symbol_table->PushStackFrameBack(res);
+        symbol_table->AppendCode("sss",
+            "mov", res->GetStackFrameAddress(), l->GetStackFrameAddress());
+        symbol_table->AppendCode("ssd",
+            "sub", l->GetStackFrameAddress(), 1);
+
+        return res;
+      }
+    );
   }
 
   void PushStackFrameBack(SymbolTable *symbol_table) override;

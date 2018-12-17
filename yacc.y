@@ -144,6 +144,10 @@ postfix_expression
   { $$ = new FunctionCallExpressionNode($1, $3); }
   | postfix_expression '(' ')'
   { $$ = new FunctionCallExpressionNode($1, nullptr); }
+  | postfix_expression INC_OP
+  { $$ = new UnaryExpressionNode(Operator::POSTFIX_INCREMENT, $1); }
+  | postfix_expression DEC_OP
+  { $$ = new UnaryExpressionNode(Operator::POSTFIX_DECREMENT, $1); }
   ;
 
 argument_expression_list
