@@ -90,7 +90,7 @@ struct SymbolTable {
     return parent->GetTypeValueOffset(type_value) + parent->stack_frame_size + (1 /* push ebp */ );
   }
 
-  inline SymbolTable* Push(string name) {
+  inline SymbolTable* Push(string name = "") {
     SymbolTable *next = new SymbolTable(name, this);
     symbol_table = next;
     return symbol_table;

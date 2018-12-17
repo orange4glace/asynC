@@ -55,7 +55,7 @@ void yyerror(char * s);
     logical_or_expression conditional_expression expression assignment_expression
     argument_expression_list constant_expression async_expression
     variable_capture_list variable_capture
-%type <statement> statement expression_statement compound_statement selection_statement iteration_statement
+%type <statement> statement expression_statement compound_statement selection_statement iteration_statement for_statement
     return_statement print_statement
 %type <function_definition> function_definition
 %type <parameter_declaration> parameter_declaration_list parameter_declaration
@@ -472,6 +472,7 @@ initializer
 statement
   : compound_statement { $$ = $1; }
   | iteration_statement { $$ = $1; }
+  | for_statement { $$ = $1; }
   | selection_statement { $$ = $1; }
   | return_statement { $$ = $1; }
   | print_statement { $$ = $1; }
@@ -563,6 +564,11 @@ iteration_statement
   {
     $$ = new IterationStatementNode($3, $5);
   }
+
+for_statement
+  : FOR '(' declaration expression_statement expression ')' statement
+  { $$ = new ForStatementNode($3, $4, $5, $7); }
+  ;
 
 return_statement
   : RETURN expression ';'

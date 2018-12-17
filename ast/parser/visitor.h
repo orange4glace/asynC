@@ -286,6 +286,38 @@ struct Visitor {
     symbol_table->Pop();
   }
 
+  void Visit(ForStatementNode *node) {
+    symbol_table->SaveBasePointer();
+    symbol_table->Push(); // Initiailzer stack frame
+    symbol_table->AppendCode("sd", "# for loop initiailzer", node->id);
+    if (node->init_expression) node->init_expression->Accept(this);
+    if (node->init_declaration) node->init_declaration->Accept(this);
+
+    symbol_table->AppendCode("ssd", "loop_start:", "# for", node->id);
+    symbol_table->SaveBasePointer();
+    symbol_table->Push(); // condition stack frame
+    node->condition->Accept(this);
+    symbol_table->AppendCode("ssd", "cmp", type_value->GetStackFrameAddress(), 0);
+    symbol_table->ClearStackFrame(); // clear condition stack frame
+    symbol_table->RestoreBasePointer();
+    symbol_table->Pop();
+    symbol_table->AppendCode("ss", "je", "loop_end");
+
+    symbol_table->SaveBasePointer();
+    symbol_table->Push(); // iterator & statement stack frame
+    node->statement->Accept(this);
+    node->iterator->Accept(this);
+    symbol_table->ClearStackFrame(); // clear iterator & statement
+    symbol_table->RestoreBasePointer();
+    symbol_table->Pop();
+    symbol_table->AppendCode("ss", "jmp", "loop_start");
+    symbol_table->AppendCode("ssd", "loop_end:", "# end of for", node->id);
+
+    symbol_table->ClearStackFrame(); // clear initializer
+    symbol_table->RestoreBasePointer();
+    symbol_table->Pop();
+  }
+
   void Visit(SelectionStatementNode *node) {
     node->cond->Accept(this);
     symbol_table->AppendCode("ssdsd", "cmp", type_value->GetStackFrameAddress(), 0, "# if", node->id);
