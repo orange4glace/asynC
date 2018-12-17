@@ -21,10 +21,11 @@ struct Array : TypeValueBase<Array> {
     return nullptr;
   }
 
-  inline TypeValue *GetTypeValueAt(int index) {
+  inline TypeValue *GetTypeValueAt(Integer *index) {
     TypeValue *element = element_type_value->Clone();
-    element->local_symbol_table = this->local_symbol_table;
-    element->stack_frame_offset = this->stack_frame_offset + index;
+    element->addressing_mode = INDEX_ADDRESSING;
+    element->index_base = this;
+    element->index_offset = index;
     return element;
   }
 

@@ -152,7 +152,7 @@ struct Visitor {
     assert_type(type_value, Type::INTEGER);
     Integer *index = static_cast<Integer*>(type_value);
 
-    type_value = array->GetTypeValueAt(index->value);
+    type_value = array->GetTypeValueAt(index);
     cout << "ARRAY TYPE VALUE " << TypeToString(type_value->type()) << endl;
   }
 

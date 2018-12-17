@@ -11,13 +11,23 @@ using namespace std;
 
 struct SymbolTable;
 
+#define DIRECT_ADDRESSING 0
+#define INDEX_ADDRESSING 1
+
 struct TypeValue {
 
   bool lvalue;
   int stack_frame_offset;
   SymbolTable *local_symbol_table;
 
-  inline TypeValue() : local_symbol_table(nullptr) {}
+  int addressing_mode;
+  TypeValue *index_base;
+  TypeValue *index_offset;
+
+  inline TypeValue() : local_symbol_table(nullptr) {
+    addressing_mode = DIRECT_ADDRESSING;
+    index_base = index_offset = nullptr;
+  }
 
   virtual TypeValue* Clone() = 0;
 
