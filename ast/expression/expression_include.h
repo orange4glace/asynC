@@ -19,5 +19,7 @@
 #include "async_expression.h"
 #include "cast_expression.h"
 #include "unary_expression.h"
+#include "new_expression.h"
+#include "dereference_expression.h"
 
 #endif

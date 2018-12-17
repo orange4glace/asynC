@@ -53,14 +53,14 @@ void yyerror(char * s);
     shift_expression relational_expression equality_expression and_expression
     exclusive_or_expression inclusive_or_expression logical_and_expression
     logical_or_expression conditional_expression expression assignment_expression
-    argument_expression_list constant_expression async_expression
+    argument_expression_list constant_expression async_expression new_expression
     variable_capture_list variable_capture
 %type <statement> statement expression_statement compound_statement selection_statement iteration_statement for_statement
     return_statement print_statement
 %type <function_definition> function_definition
 %type <parameter_declaration> parameter_declaration_list parameter_declaration
 %type <type_name> type_name
-%type <node> compound_statement_body abstract_declarator direct_abstract_declarator
+%type <node> compound_statement_body abstract_declarator direct_abstract_declarator pointer
 
 
 %error-verbose
@@ -75,7 +75,7 @@ void yyerror(char * s);
 %token CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE CONST VOLATILE VOID ASYNC
 %token STRUCT UNION ENUM ELLIPSIS
 
-%token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN PRINT
+%token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN PRINT NEW
 
 %start translation_unit
 %%
@@ -169,7 +169,10 @@ unary_expression
   { $$ = new UnaryExpressionNode(Operator::INCREMENT, $2); }
   | DEC_OP unary_expression
   { $$ = new UnaryExpressionNode(Operator::DECREMENT, $2); }
-//| unary_operator cast_expression
+  | '*' cast_expression
+  { $$ = new DereferenceExpressionNode($2); }
+  | new_expression
+  { $$ = $1; }
   ;
 
 unary_operator
@@ -190,6 +193,11 @@ cast_expression
   {
     $$ = new CastExpressionNode($2, $4);
   }
+  ;
+
+new_expression
+  : NEW type_specifier '(' ')'
+  { $$ = new NewExpressionNode($2); }
   ;
 
 multiplicative_expression
@@ -417,7 +425,12 @@ type_specifier
   ;
 
 declarator
-  : direct_declarator
+  : pointer direct_declarator
+  {
+    $$ = new DeclaratorNode($2);
+    $$->pointer = static_cast<PointerNode*>($1);
+  }
+  | direct_declarator
   {
     $$ = new DeclaratorNode($1);
   }
@@ -433,6 +446,18 @@ direct_declarator
     // Todo : Only 1-dimensional array is allowed
     $$ = $1;
     $1->array_constant = static_cast<ConstantExpressionNode*>($3);
+  }
+  ;
+
+pointer
+  : '*'
+  {
+    $$ = new PointerNode();
+  }
+  | '*' pointer
+  {
+    $$ = new PointerNode();
+    $$->next = $2;
   }
   ;
 

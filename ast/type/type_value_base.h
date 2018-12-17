@@ -25,6 +25,7 @@ struct TypeValueBase : TypeValue {
   }
 
   TypeValue* ExecuteOperator(Operator op, TypeValue *rhs) override {
+    cout << "exe op " << OperatorToString(op) << " " << TypeToString(type()) << " " << TypeToString(rhs->type()) << endl;
     TypePair key(op, this->type(), rhs->type());
     assert(Derived::binary_operator_map.count(key) != 0);
     auto func = Derived::binary_operator_map[key];

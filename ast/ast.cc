@@ -11,6 +11,7 @@
 #include "ast/function_definition.h"
 #include "ast/parameter_declaration.h"
 #include "ast/type_name.h"
+#include "ast/pointer.h"
 #include "ast/parser/visitor.h"
 
 #include "ast/type/integer.h"
@@ -29,6 +30,7 @@ int global_id = 0;
 void init_ast() {
   Void::Initialize();
   Integer::Initialize();
+  Pointer::Initialize();
 }
 
 void DeclarationNode::Accept(Visitor *visitor) { visitor->Visit(this); }
@@ -43,3 +45,4 @@ void ParameterDeclarationNode::Accept(Visitor *visitor) { visitor->Visit(this); 
 void AbstractDeclaratorNode::Accept(Visitor *visitor) { assert(false); /* visitor->Visit(this); */ }
 void DirectAbstractDeclaratorNode::Accept(Visitor *visitor) { assert(false); /* visitor->Visit(this); */ }
 void TypeNameNode::Accept(Visitor *visitor) { assert(false); /* visitor->Visit(this); */ }
+void PointerNode::Accept(Visitor *visitor) { visitor->Visit(this); }

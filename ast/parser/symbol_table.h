@@ -121,6 +121,10 @@ struct SymbolTable {
     symbol_table->AppendCode("ssd", "add", "esp", stack_frame_size * 4);
   }
 
+  inline void Malloc() {
+    symbol_table->AppendCode("s", "malloc");
+  }
+
   inline void AppendCode(const char* fmt...) {
     va_list args;
     va_start(args, fmt);

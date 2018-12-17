@@ -11,6 +11,7 @@ enum class Type : int {
   ASYNC,
   FUNCTION,
   ARRAY,
+  POINTER,
 };
 
 inline extern std::string TypeToString(Type type) {
@@ -22,6 +23,7 @@ inline extern std::string TypeToString(Type type) {
   case Type::ASYNC: return "ASYNC";
   case Type::FUNCTION: return "FUNCTION";
   case Type::ARRAY: return "ARRAY";
+  case Type::POINTER: return "POINTER";
   default: return "UNKNOWN";
   }
 }

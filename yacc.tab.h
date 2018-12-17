@@ -98,7 +98,8 @@
      CONTINUE = 314,
      BREAK = 315,
      RETURN = 316,
-     PRINT = 317
+     PRINT = 317,
+     NEW = 318
    };
 #endif
 
@@ -134,7 +135,7 @@ typedef union YYSTYPE
 
 
 /* Line 1676 of yacc.c  */
-#line 138 "yacc.tab.h"
+#line 139 "yacc.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

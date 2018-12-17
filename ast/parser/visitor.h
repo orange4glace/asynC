@@ -22,6 +22,7 @@
 #include "ast/node.h"
 #include "ast/type_specifier.h"
 #include "ast/type_name.h"
+#include "ast/pointer.h"
 #include "ast/function_definition.h"
 #include "ast/parameter_declaration.h"
 #include "ast/operator.h"
@@ -32,6 +33,7 @@ struct Visitor {
   ExpressionNode *expression;
   Identifier *identifier;
   TypeValue *type_value;
+  TypeValue *type_value2;
   StatementNode* statement;
 
   Visitor() {
@@ -63,16 +65,13 @@ struct Visitor {
     indent();
     cout << "(InitDeclarator)\n";
     ii();
-    // We know the Type since we visit TypeSpecifierNode
-    // before visiting InitDeclarationNode
-    TypeValue* declarator_type_value = type_value;
 
-    type_value = nullptr;
     node->declarator->Accept(this);
     // Now we have an complete typevalue and identifier
-    Identifier* declarator_identifier = identifier;
+    Identifier *declarator_identifier = identifier;
+    TypeValue *declarator_type_value = type_value2;
     // Check is array
-    TypeValue* array_constant = type_value;
+    TypeValue *array_constant = type_value;
     if (array_constant) {
       assert(array_constant->type() == Type::INTEGER);
       int size = (static_cast<Integer*>(array_constant))->value;
@@ -97,6 +96,13 @@ struct Visitor {
   }
 
   void Visit(DeclaratorNode *node) {
+    Node *pointer = node->pointer;
+    while (pointer) {
+      pointer->Accept(this);
+      pointer = pointer->next;
+    }
+    type_value2 = type_value;
+    type_value = nullptr;
     node->direct_declarator->Accept(this);
   }
 
@@ -104,6 +110,10 @@ struct Visitor {
     node->identifier->Accept(this);
     if (node->array_constant)
       node->array_constant->Accept(this);
+  }
+
+  void Visit(PointerNode *node) {
+    type_value = new Pointer(type_value);
   }
 
   void Visit(IdentifierNode *node) {
@@ -156,6 +166,24 @@ struct Visitor {
     cout << "ARRAY TYPE VALUE " << TypeToString(type_value->type()) << endl;
   }
 
+  void Visit(NewExpressionNode *node) {
+    node->type_specifier->Accept(this);
+    TypeValue *content = type_value;
+    Pointer *pointer = new Pointer(content);
+    pointer->created_by_new = true;
+    symbol_table->Malloc();
+    symbol_table->PushStackFrameBack(pointer);
+    type_value = pointer;
+  }
+
+  void Visit(DereferenceExpressionNode *node) {
+    node->expression->Accept(this);
+    TypeValue *rhs = type_value;
+    assert_type(rhs, Type::POINTER);
+    Pointer *pointer = static_cast<Pointer*>(rhs);
+    type_value = pointer->content_type_value;
+  }
+
   void Visit(BinaryExpressionNode *node) {
     type_value = nullptr;
     node->rhs->Accept(this);
@@ -174,7 +202,9 @@ struct Visitor {
 
   void Visit(ConstantExpressionNode *node) {
     type_value = node->type_value;
+    Integer *integer = static_cast<Integer*>(type_value);
     symbol_table->PushStackFrameBack(type_value);
+    symbol_table->AppendCode("ssd", "mov", "(esp)", integer->value);
   }
 
   void Visit(FunctionCallExpressionNode *node) {

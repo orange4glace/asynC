@@ -14,7 +14,12 @@ struct SymbolTable;
 #define DIRECT_ADDRESSING 0
 #define INDEX_ADDRESSING 1
 
+struct Pointer;
+
 struct TypeValue {
+
+  bool referenced;
+  Pointer* referrer;
 
   bool lvalue;
   int stack_frame_offset;
@@ -25,6 +30,7 @@ struct TypeValue {
   TypeValue *index_offset;
 
   inline TypeValue() : local_symbol_table(nullptr) {
+    referenced = false;
     addressing_mode = DIRECT_ADDRESSING;
     index_base = index_offset = nullptr;
   }
@@ -33,6 +39,10 @@ struct TypeValue {
 
   virtual TypeValue* ExecuteOperator(Operator op, TypeValue* rhs) = 0;
   virtual TypeValue* ExecuteOperator(Operator op) = 0;
+
+  virtual inline bool CheckType(TypeValue *rhs) {
+    return type() != rhs->type();
+  }
 
   virtual Type type() = 0;
 
@@ -43,7 +53,7 @@ struct TypeValue {
   }
 
   const char* GetStackFrameAddress();
-  virtual inline void PushStackFrameBack(SymbolTable *symbol_table) {};
+  virtual void PushStackFrameBack(SymbolTable *symbol_table);
 
 };
 

@@ -4,6 +4,8 @@
 void AssignmentExpressionNode::Accept(Visitor *visitor) { visitor->Visit(this); }
 void BinaryExpressionNode::Accept(Visitor *visitor) { visitor->Visit(this); }
 void UnaryExpressionNode::Accept(Visitor *visitor) { visitor->Visit(this); }
+void NewExpressionNode::Accept(Visitor *visitor) { visitor->Visit(this); }
+void DereferenceExpressionNode::Accept(Visitor *visitor) { visitor->Visit(this); }
 void ConstantExpressionNode::Accept(Visitor *visitor) { visitor->Visit(this); }
 void IdentifierExpressionNode::Accept(Visitor *visitor) { visitor->Visit(this); }
 void ArrayExpressionNode::Accept(Visitor *visitor) { visitor->Visit(this); }

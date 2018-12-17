@@ -13,8 +13,6 @@ struct Void : TypeValueBase<Void> {
 
   inline static void Initialize() {}
 
-  void PushStackFrameBack(SymbolTable *symbol_table) override;
-
   void Print(std::ostream& str) const override {
     indent();
     str << "[Void]\n";

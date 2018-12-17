@@ -272,9 +272,7 @@ struct Integer : TypeValueBase<Integer> {
       }
     );
   }
-
-  void PushStackFrameBack(SymbolTable *symbol_table) override;
-
+  
   void Print(std::ostream& str) const override {
     indent();
     str << "[Integer] " << value << "\n";

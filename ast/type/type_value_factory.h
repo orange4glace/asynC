@@ -6,6 +6,7 @@
 #include "integer.h"
 #include "void.h"
 #include "array.h"
+#include "pointer.h"
 
 struct TypeValueFactory {
 

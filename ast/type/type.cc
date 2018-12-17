@@ -3,8 +3,20 @@
 #include "ast/type/integer.h"
 #include "ast/type/void.h"
 #include "ast/type/array.h"
+#include "ast/type/pointer.h"
+
+void TypeValue::PushStackFrameBack(SymbolTable *symbol_table) {
+  symbol_table->AppendCode("sd", "push", 0);
+  this->local_symbol_table = symbol_table;
+  this->stack_frame_offset = ++symbol_table->stack_frame_size;
+}
 
 const char* TypeValue::GetStackFrameAddress() {
+  if (referenced) {
+    cout << "referenced" << endl;
+    symbol_table->AppendCode("sss", "mov", "esi", referrer->GetStackFrameAddress());
+    return "[esi]";
+  }
   if (addressing_mode == DIRECT_ADDRESSING) {
     int off = symbol_table->GetTypeValueOffset(this);
     string* c = new string(
@@ -19,18 +31,6 @@ const char* TypeValue::GetStackFrameAddress() {
   }
 }
 
-void Integer::PushStackFrameBack(SymbolTable *symbol_table) {
-  symbol_table->AppendCode("sd", "push", this->value);
-  this->local_symbol_table = symbol_table;
-  this->stack_frame_offset = ++symbol_table->stack_frame_size;
-}
-
-void Void::PushStackFrameBack(SymbolTable *symbol_table) {
-  symbol_table->AppendCode("sd", "push", 0);
-  this->local_symbol_table = symbol_table;
-  this->stack_frame_offset = ++symbol_table->stack_frame_size;
-}
-
 void Array::PushStackFrameBack(SymbolTable *symbol_table) {
   this->local_symbol_table = symbol_table;
   this->stack_frame_offset = symbol_table->stack_frame_size + 1;
@@ -38,5 +38,16 @@ void Array::PushStackFrameBack(SymbolTable *symbol_table) {
     if (i == 0) symbol_table->AppendCode("sdsd", "push", 0, "# start array size", size);
     else symbol_table->AppendCode("sd", "push", 0);
     symbol_table->stack_frame_size++;
+  }
+}
+
+void Pointer::PushStackFrameBack(SymbolTable *symbol_table) {
+  if (created_by_new) {
+    symbol_table->AppendCode("ss", "push", "eax");
+    this->local_symbol_table = symbol_table;
+    this->stack_frame_offset = ++symbol_table->stack_frame_size;
+  }
+  else {
+    TypeValue::PushStackFrameBack(symbol_table);
   }
 }
