@@ -31,6 +31,7 @@ void init_ast() {
   Void::Initialize();
   Integer::Initialize();
   Pointer::Initialize();
+  Array::Initialize();
 }
 
 void DeclarationNode::Accept(Visitor *visitor) { visitor->Visit(this); }
@@ -42,7 +43,7 @@ void InitializerNode::Accept(Visitor *visitor) { visitor->Visit(this); }
 void TypeSpecifierNode::Accept(Visitor *visitor) { visitor->Visit(this); }
 void FunctionDefinitionNode::Accept(Visitor *visitor) { visitor->Visit(this); }
 void ParameterDeclarationNode::Accept(Visitor *visitor) { visitor->Visit(this); }
-void AbstractDeclaratorNode::Accept(Visitor *visitor) { assert(false); /* visitor->Visit(this); */ }
+void AbstractDeclaratorNode::Accept(Visitor *visitor) { visitor->Visit(this); }
 void DirectAbstractDeclaratorNode::Accept(Visitor *visitor) { assert(false); /* visitor->Visit(this); */ }
 void TypeNameNode::Accept(Visitor *visitor) { assert(false); /* visitor->Visit(this); */ }
 void PointerNode::Accept(Visitor *visitor) { visitor->Visit(this); }

@@ -5,30 +5,44 @@
 #include "ast/type/array.h"
 #include "ast/type/pointer.h"
 
+const char* TypeValue::GetIndirectAddress() {
+  int off = symbol_table->GetTypeValueOffset(this);
+  if (refffffff) {
+    string* c = new string(
+      off == 0 ? "" : std::to_string(off) + "{ebp}");
+    return c->c_str();
+  }
+  string* c = new string(
+    off == 0 ? "" : std::to_string(off) + "(ebp)");
+  return c->c_str();
+}
+
+const char* TypeValue::GetAddress() {
+  /*
+  if (referenced) {
+    cout << "referenced" << endl;
+    symbol_table->AppendCode("sss", "mov", "esi", referrer->GetIndirectAddress());
+    symbol_table->AppendCode("ss", "push", "esi");
+    int res_off = -(++symbol_table->stack_frame_size);
+    string* c = new string(
+      res_off == 0 ? "" : std::to_string(res_off) + "(ebp)");
+    return c->c_str();
+  }
+  */
+  int off = symbol_table->GetTypeValueOffset(this);
+  symbol_table->AppendCode("sss", "mem", "esi", "ebp");
+  symbol_table->AppendCode("ssd", "add", "esi", off);
+  symbol_table->AppendCode("ss", "push", "esi");
+  int res_off = -(++symbol_table->stack_frame_size);
+  string* c = new string(
+    res_off == 0 ? "" : std::to_string(res_off) + "(ebp)");
+  return c->c_str();
+}
+
 void TypeValue::PushStackFrameBack(SymbolTable *symbol_table) {
   symbol_table->AppendCode("sd", "push", 0);
   this->local_symbol_table = symbol_table;
   this->stack_frame_offset = ++symbol_table->stack_frame_size;
-}
-
-const char* TypeValue::GetStackFrameAddress() {
-  if (referenced) {
-    cout << "referenced" << endl;
-    symbol_table->AppendCode("sss", "mov", "esi", referrer->GetStackFrameAddress());
-    return "[esi]";
-  }
-  if (addressing_mode == DIRECT_ADDRESSING) {
-    int off = symbol_table->GetTypeValueOffset(this);
-    string* c = new string(
-      off == 0 ? "" : std::to_string(off) + "(ebp)");
-    return c->c_str();
-  }
-  else if (addressing_mode == INDEX_ADDRESSING) {
-    // commit index register first
-    symbol_table->AppendCode("ssd", "mov", "esi", symbol_table->GetTypeValueOffset(index_base));
-    symbol_table->AppendCode("sss", "sub", "esi", index_offset->GetStackFrameAddress());
-    return "esi(ebp)";
-  }
 }
 
 void Array::PushStackFrameBack(SymbolTable *symbol_table) {

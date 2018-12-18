@@ -171,6 +171,8 @@ unary_expression
   { $$ = new UnaryExpressionNode(Operator::DECREMENT, $2); }
   | '*' cast_expression
   { $$ = new DereferenceExpressionNode($2); }
+  | '&' cast_expression
+  { $$ = new UnaryExpressionNode(Operator::REFERENCE, $2); }
   | new_expression
   { $$ = $1; }
   ;
@@ -197,7 +199,11 @@ cast_expression
 
 new_expression
   : NEW type_specifier '(' ')'
-  { $$ = new NewExpressionNode($2); }
+  { $$ = new NewExpressionNode(static_cast<TypeSpecifierNode*>($2), nullptr); }
+  | NEW type_specifier abstract_declarator '(' ')'
+  { $$ = new NewExpressionNode(
+        static_cast<TypeSpecifierNode*>($2),
+        static_cast<AbstractDeclaratorNode*>($3)); }
   ;
 
 multiplicative_expression
@@ -471,15 +477,29 @@ type_name
   ;
 
 abstract_declarator
-  : direct_abstract_declarator
+  : pointer
+  { 
+    AbstractDeclaratorNode *node = new AbstractDeclaratorNode();
+    node->pointer = static_cast<PointerNode*>($1);
+    $$ = node;
+  }
+  | direct_abstract_declarator
   {
-    $$ = new AbstractDeclaratorNode(
-      static_cast<DirectAbstractDeclaratorNode*>($1));
+    AbstractDeclaratorNode *node = new AbstractDeclaratorNode();
+    node->direct_abstract_declarator = static_cast<DirectAbstractDeclaratorNode*>($1);
+    $$ = node;
+  }
+  | pointer direct_abstract_declarator
+  {
+    AbstractDeclaratorNode *node = new AbstractDeclaratorNode();
+    node->pointer = static_cast<PointerNode*>($1);
+    node->direct_abstract_declarator = static_cast<DirectAbstractDeclaratorNode*>($2);
+    $$ = node;
   }
   ;
 
 direct_abstract_declarator
-  :
+  : '[' constant_expression ']'
   {
     $$ = new DirectAbstractDeclaratorNode();
   }

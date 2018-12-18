@@ -18,6 +18,9 @@ struct Function : TypeValueBase<Function> {
     return nullptr;
   }
 
+  inline static void __Initialize() {
+  }
+
   void Print(std::ostream& str) const override {
     indent();
     str << "[Function]\n";

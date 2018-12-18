@@ -68,7 +68,7 @@ struct SymbolTable {
 
   inline void PushStackFrameBack(TypeValue* type_value) {
     if (type_value->local_symbol_table) {
-      symbol_table->AppendCode("ss", "push", type_value->GetStackFrameAddress());
+      symbol_table->AppendCode("ss", "push", type_value->GetIndirectAddress());
       ++symbol_table->stack_frame_size;
     }
     else type_value->PushStackFrameBack(this);

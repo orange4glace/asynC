@@ -112,6 +112,18 @@ struct Visitor {
       node->array_constant->Accept(this);
   }
 
+  void Visit(AbstractDeclaratorNode *node) {
+    Node *pointer = node->pointer;
+    while (pointer) {
+      pointer->Accept(this);
+      pointer = pointer->next;
+    }
+    type_value2 = type_value;
+    type_value = nullptr;
+    if (node->direct_abstract_declarator)
+      node->direct_abstract_declarator->Accept(this);
+  }
+
   void Visit(PointerNode *node) {
     type_value = new Pointer(type_value);
   }
@@ -152,23 +164,21 @@ struct Visitor {
     node->identifier->Accept(this);
     type_value = symbol_table->GetSymbol(identifier);
   }
-
+  
   void Visit(ArrayExpressionNode *node) {
+    type_value = nullptr;
     node->expression->Accept(this);
-    assert_type(type_value, Type::ARRAY);
-    Array *array = static_cast<Array*>(type_value);
-
+    TypeValue *lhs = type_value;
     node->index->Accept(this);
-    assert_type(type_value, Type::INTEGER);
-    Integer *index = static_cast<Integer*>(type_value);
-
-    type_value = array->GetTypeValueAt(index);
-    cout << "ARRAY TYPE VALUE " << TypeToString(type_value->type()) << endl;
+    TypeValue *rhs = type_value;
+    type_value = lhs->ExecuteOperator(Operator::SUBSCRIPT, rhs);
   }
 
   void Visit(NewExpressionNode *node) {
     node->type_specifier->Accept(this);
-    TypeValue *content = type_value;
+    type_value2 = type_value;
+    if (node->abstract_declarator) node->abstract_declarator->Accept(this);
+    TypeValue *content = type_value2;
     Pointer *pointer = new Pointer(content);
     pointer->created_by_new = true;
     symbol_table->Malloc();
@@ -181,7 +191,13 @@ struct Visitor {
     TypeValue *rhs = type_value;
     assert_type(rhs, Type::POINTER);
     Pointer *pointer = static_cast<Pointer*>(rhs);
-    type_value = pointer->content_type_value;
+    TypeValue *dereferenced = pointer->content_type_value->Clone();
+    dereferenced->refffffff = true;
+    
+    symbol_table->AppendCode("ss", "push", pointer->GetIndirectAddress());
+    dereferenced->local_symbol_table = symbol_table;
+    dereferenced->stack_frame_offset = ++symbol_table->stack_frame_size;
+    type_value = dereferenced;
   }
 
   void Visit(BinaryExpressionNode *node) {
@@ -280,7 +296,7 @@ struct Visitor {
       TypeValue *return_value_address = symbol_table->GetSymbol(new Identifier("return"));
       assert(return_value_address);
       symbol_table->AppendCode("ssss", "mov",
-          return_value_address->GetStackFrameAddress(), return_value->GetStackFrameAddress(),
+          return_value_address->GetIndirectAddress(), return_value->GetIndirectAddress(),
           "# set return value");
     }
     SymbolTable *return_symbol_table = symbol_table->GetLocalSymbolTable(new Identifier("return"));
@@ -306,7 +322,7 @@ struct Visitor {
     symbol_table->Push("Iteration");
     symbol_table->AppendCode("ssd", "loop_start:", "# while", node->id);
     node->cond->Accept(this);
-    symbol_table->AppendCode("ssd", "cmp", type_value->GetStackFrameAddress(), 0);
+    symbol_table->AppendCode("ssd", "cmp", type_value->GetIndirectAddress(), 0);
     symbol_table->AppendCode("ss", "je", "loop_end");
     node->stmt->Accept(this);
     symbol_table->ClearStackFrame();
@@ -327,7 +343,7 @@ struct Visitor {
     symbol_table->SaveBasePointer();
     symbol_table->Push(); // condition stack frame
     node->condition->Accept(this);
-    symbol_table->AppendCode("ssd", "cmp", type_value->GetStackFrameAddress(), 0);
+    symbol_table->AppendCode("ssd", "cmp", type_value->GetIndirectAddress(), 0);
     symbol_table->ClearStackFrame(); // clear condition stack frame
     symbol_table->RestoreBasePointer();
     symbol_table->Pop();
@@ -350,7 +366,7 @@ struct Visitor {
 
   void Visit(SelectionStatementNode *node) {
     node->cond->Accept(this);
-    symbol_table->AppendCode("ssdsd", "cmp", type_value->GetStackFrameAddress(), 0, "# if", node->id);
+    symbol_table->AppendCode("ssdsd", "cmp", type_value->GetIndirectAddress(), 0, "# if", node->id);
     symbol_table->AppendCode("ss", "je", "else_start");
 
     // if
@@ -375,7 +391,7 @@ struct Visitor {
 
   void Visit(PrintStatementNode *node) {
     node->expression->Accept(this);
-    symbol_table->AppendCode("ss", "prn", type_value->GetStackFrameAddress());
+    symbol_table->AppendCode("ss", "prn", type_value->GetIndirectAddress());
   }
 
 };

@@ -17,6 +17,7 @@ struct DeclaratorNode : Node {
     indent();
     cout << "[Declarator]\n";
     ii();
+    if (pointer) pointer->Print();
     direct_declarator->Print();
     di();
   }

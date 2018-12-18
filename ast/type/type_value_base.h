@@ -24,6 +24,12 @@ struct TypeValueBase : TypeValue {
     Derived::unary_operator_map.insert({type_single, func});
   }
 
+  static void Initialize() {
+    Derived::__InitializeBase();
+    Derived::__Initialize();
+  }
+  static void __InitializeBase();
+
   TypeValue* ExecuteOperator(Operator op, TypeValue *rhs) override {
     cout << "exe op " << OperatorToString(op) << " " << TypeToString(type()) << " " << TypeToString(rhs->type()) << endl;
     TypePair key(op, this->type(), rhs->type());

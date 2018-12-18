@@ -11,27 +11,19 @@ using namespace std;
 
 struct SymbolTable;
 
-#define DIRECT_ADDRESSING 0
-#define INDEX_ADDRESSING 1
-
-struct Pointer;
-
 struct TypeValue {
 
-  bool referenced;
-  Pointer* referrer;
+  bool refffffff;
 
   bool lvalue;
   int stack_frame_offset;
   SymbolTable *local_symbol_table;
 
-  int addressing_mode;
   TypeValue *index_base;
   TypeValue *index_offset;
 
   inline TypeValue() : local_symbol_table(nullptr) {
-    referenced = false;
-    addressing_mode = DIRECT_ADDRESSING;
+    refffffff = false;
     index_base = index_offset = nullptr;
   }
 
@@ -52,7 +44,8 @@ struct TypeValue {
     return str;
   }
 
-  const char* GetStackFrameAddress();
+  const char* GetIndirectAddress();
+  const char* GetAddress();
   virtual void PushStackFrameBack(SymbolTable *symbol_table);
 
 };

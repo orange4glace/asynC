@@ -22,6 +22,8 @@ enum class Operator : int {
   GREATER_EQUAL,
   LESS,
   LESS_EQUAL,
+  SUBSCRIPT,
+  REFERENCE,
 };
 
 inline extern std::string OperatorToString(Operator op) {
@@ -44,6 +46,8 @@ inline extern std::string OperatorToString(Operator op) {
   case Operator::GREATER_EQUAL: return "GREATER_EQUAL";
   case Operator::LESS: return "LESS";
   case Operator::LESS_EQUAL: return "LESS_EQUAL";
+  case Operator::SUBSCRIPT: return "SUBSCRIPT";
+  case Operator::REFERENCE: return "REFERENCE";
   default: return "UNKNOWN";
   }
 }

@@ -16,20 +16,21 @@ struct Pointer : TypeValueBase<Pointer> {
   inline Pointer(TypeValue *el)
     : content_type_value(el) {
     created_by_new = false;
-    content_type_value->referenced = true;
-    content_type_value->referrer = this;
   }
 
-  inline static void Initialize() {
+  inline static void __Initialize() {
     Pointer::AddOperatorFunction(
       TypePair(Operator::ASSIGNMENT, Pointer::_type(), Pointer::_type()),
       [](TypeValue* l, TypeValue* r) -> TypeValue* {
         Pointer* lhs = static_cast<Pointer*>(l);
         Pointer* rhs = static_cast<Pointer*>(r);
 
+        rhs->GetIndirectAddress();
+        lhs->GetIndirectAddress();
+
         // Code generation
         symbol_table->AppendCode("sss",
-            "mov", lhs->GetStackFrameAddress(), rhs->GetStackFrameAddress());
+            "mov", lhs->GetIndirectAddress(), rhs->GetIndirectAddress());
 
         return lhs;
       }
@@ -61,5 +62,23 @@ struct Pointer : TypeValueBase<Pointer> {
   void PushStackFrameBack(SymbolTable *symbol_table) override;
 
 };
+
+template <typename Derived>
+void TypeValueBase<Derived>::__InitializeBase() {
+  Derived::AddOperatorFunction(
+    TypeSingle(Operator::REFERENCE, Derived::_type()),
+    [](TypeValue* l) -> TypeValue* {
+      Derived* lhs = static_cast<Derived*>(l);
+
+      Pointer* pointer = new Pointer(lhs);
+
+      pointer->PushStackFrameBack(symbol_table);
+      // Code generation
+      symbol_table->AppendCode("sss", "mov", pointer->GetIndirectAddress(), lhs->GetAddress());
+
+      return pointer;
+    }
+  );
+}
 
 #endif
