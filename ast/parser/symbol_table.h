@@ -15,6 +15,7 @@ using namespace std;
 
 struct SymbolTable;
 extern SymbolTable *symbol_table;
+extern SymbolTable *root_symbol_table;
 
 struct TableCompare {
   inline bool operator()(Identifier* const& lhs, Identifier* const& rhs) const {
@@ -29,6 +30,7 @@ struct SymbolTable {
   SymbolTable *parent;
   map<Identifier*, SymbolTableEntry*, TableCompare> table;
   vector<string> code;
+  int instruction_size;
 
   int stack_frame_size;
 
@@ -37,6 +39,7 @@ struct SymbolTable {
     this->name = name;
     stack_frame_size = 0;
     this->id = global_id++;
+    instruction_size = 0;
   }
 
   inline SymbolTable(string name, SymbolTable *p) : SymbolTable(name) {
@@ -68,14 +71,14 @@ struct SymbolTable {
 
   inline void PushStackFrameBack(TypeValue* type_value) {
     if (type_value->local_symbol_table) {
-      symbol_table->AppendCode("ss", "push", type_value->GetIndirectAddress());
+      symbol_table->AppendInstruction("ss", "push", type_value->GetIndirectAddress());
       ++symbol_table->stack_frame_size;
     }
     else type_value->PushStackFrameBack(this);
   }
 
   inline int PushStackFrameBack() {
-    AppendCode("sd", "push", 0);
+    AppendInstruction("sd", "push", 0);
     return ++stack_frame_size;
   }
 
@@ -90,6 +93,11 @@ struct SymbolTable {
     return parent->GetTypeValueOffset(type_value) + parent->stack_frame_size + (1 /* push ebp */ );
   }
 
+  inline int GetTypeValueAddress(TypeValue *type_value) {
+    if (type_value->local_symbol_table == this) return -type_value->stack_frame_offset;
+    return parent->GetTypeValueOffset(type_value) + parent->stack_frame_size + (1 /* push ebp */ );
+  }
+
   inline SymbolTable* Push(string name = "") {
     SymbolTable *next = new SymbolTable(name, this);
     symbol_table = next;
@@ -99,36 +107,56 @@ struct SymbolTable {
   inline void Pop() {
     for (auto& code : this->code)
       this->parent->code.emplace_back(code);
+    this->parent->instruction_size += instruction_size;
     symbol_table = this->parent;
   }
 
   inline void SaveBasePointer() {
-    symbol_table->AppendCode("sssd", "push", "ebp", "# save base pointer", id);
-    symbol_table->AppendCode("sss", "mov", "ebp", "esp");
+    symbol_table->AppendInstruction("sssd", "push", "ebp", "# save base pointer", id);
+    symbol_table->AppendInstruction("sss", "mov", "ebp", "esp");
   }
 
   inline void RestoreBasePointer() {
-    symbol_table->AppendCode("sssd", "pop", "ebp", "# restore base pointer", symbol_table->parent->id);
+    symbol_table->AppendInstruction("sssd", "pop", "ebp", "# restore base pointer", symbol_table->parent->id);
   }
 
   inline void FunctionReturn() {
     ClearStackFrame();
-    symbol_table->AppendCode("ss", "pop", "ebp");
-    symbol_table->AppendCode("s", "ret");
+    symbol_table->AppendInstruction("ss", "pop", "ebp");
+    symbol_table->AppendInstruction("s", "ret");
   }
 
   inline void ClearStackFrame() {
-    symbol_table->AppendCode("ssd", "add", "esp", stack_frame_size * 4);
+    symbol_table->AppendInstruction("ssd", "add", "esp", stack_frame_size * 4);
   }
 
   inline void Malloc() {
-    symbol_table->AppendCode("s", "malloc");
+    symbol_table->AppendInstruction("s", "malloc");
+  }
+
+  inline void AppendInstruction(const char* fmt...) {
+    va_list args;
+    va_start(args, fmt);
+    __AppendCode(fmt, args);
+    va_end(args);
+    ++instruction_size;
+  }
+
+  inline void AppendLabel(const char* fmt...) {
+    va_list args;
+    va_start(args, fmt);
+    __AppendCode(fmt, args);
+    va_end(args);
   }
 
   inline void AppendCode(const char* fmt...) {
     va_list args;
     va_start(args, fmt);
- 
+    __AppendCode(fmt, args);
+    va_end(args);
+  }
+
+  inline void __AppendCode(const char* fmt, va_list args) {
     while (*fmt != '\0') {
         if (*fmt == 'd') {
             int i = va_arg(args, int);
@@ -140,9 +168,7 @@ struct SymbolTable {
         }
         ++fmt;
     }
-
     code.push_back("\n");
-    va_end(args);
   }
 
   inline void PrintCode() {

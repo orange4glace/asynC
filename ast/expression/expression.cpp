@@ -10,8 +10,8 @@ void ConstantExpressionNode::Accept(Visitor *visitor) { visitor->Visit(this); }
 void IdentifierExpressionNode::Accept(Visitor *visitor) { visitor->Visit(this); }
 void ArrayExpressionNode::Accept(Visitor *visitor) { visitor->Visit(this); }
 void FunctionCallExpressionNode::Accept(Visitor *visitor) { visitor->Visit(this); }
-void AsyncExpressionNode::Accept(Visitor *visitor) { assert(false); /* visitor->Visit(this); */ }
-void CastExpressionNode::Accept(Visitor *visitor) { assert(false); /* visitor->Visit(this); */ }
+void AsyncExpressionNode::Accept(Visitor *visitor) { visitor->Visit(this); }
+void CastExpressionNode::Accept(Visitor *visitor) { visitor->Visit(this); }
 void StringExpressionNode::Accept(Visitor *visitor) { }
 
 void ConditionalExpressionNode::Accept(Visitor *visitor) { }

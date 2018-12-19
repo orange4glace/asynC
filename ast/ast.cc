@@ -14,7 +14,6 @@
 #include "ast/pointer.h"
 #include "ast/parser/visitor.h"
 
-#include "ast/type/integer.h"
 #include <iostream>
 
 int indent_count = 0;
@@ -32,6 +31,9 @@ void init_ast() {
   Integer::Initialize();
   Pointer::Initialize();
   Array::Initialize();
+  Async::Initialize();
+
+  symbol_table->AddSymbol(new Identifier("start"), 0);
 }
 
 void DeclarationNode::Accept(Visitor *visitor) { visitor->Visit(this); }
@@ -45,5 +47,5 @@ void FunctionDefinitionNode::Accept(Visitor *visitor) { visitor->Visit(this); }
 void ParameterDeclarationNode::Accept(Visitor *visitor) { visitor->Visit(this); }
 void AbstractDeclaratorNode::Accept(Visitor *visitor) { visitor->Visit(this); }
 void DirectAbstractDeclaratorNode::Accept(Visitor *visitor) { assert(false); /* visitor->Visit(this); */ }
-void TypeNameNode::Accept(Visitor *visitor) { assert(false); /* visitor->Visit(this); */ }
+void TypeNameNode::Accept(Visitor *visitor) { visitor->Visit(this); }
 void PointerNode::Accept(Visitor *visitor) { visitor->Visit(this); }

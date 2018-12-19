@@ -8,5 +8,7 @@
 #include "ast/statement/for_statement.h"
 #include "ast/statement/return_statement.h"
 #include "ast/statement/print_statement.h"
+#include "ast/statement/run_statement.h"
+#include "ast/statement/join_statement.h"
 
 #endif

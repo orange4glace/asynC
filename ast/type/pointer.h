@@ -29,10 +29,32 @@ struct Pointer : TypeValueBase<Pointer> {
         lhs->GetIndirectAddress();
 
         // Code generation
-        symbol_table->AppendCode("sss",
+        symbol_table->AppendInstruction("sss",
             "mov", lhs->GetIndirectAddress(), rhs->GetIndirectAddress());
 
         return lhs;
+      }
+    );
+    
+    Pointer::AddOperatorFunction(
+      TypePair(Operator::SUBSCRIPT, Pointer::_type(), Integer::_type()),
+      [](TypeValue* l, TypeValue *r) -> TypeValue* {
+        Pointer* lhs = static_cast<Pointer*>(l);
+        Integer* rhs = static_cast<Integer*>(r);
+
+        TypeValue *element = lhs->content_type_value->Clone();
+        element->refffffff = true;
+
+        // Code generation
+        symbol_table->AppendInstruction("ssss", "mov", "ecx", lhs->GetIndirectAddress(), "# get subscript base address");
+        symbol_table->AppendInstruction("sss", "mov", "edx", rhs->GetIndirectAddress());
+        symbol_table->AppendInstruction("ssd", "mul", "edx", lhs->content_type_value->size);
+        symbol_table->AppendInstruction("ssss", "sub", "ecx", "edx", "# add subscript offset");
+        symbol_table->AppendInstruction("sss", "push", "ecx", "# subscript element");
+        element->local_symbol_table = symbol_table;
+        element->stack_frame_offset = ++symbol_table->stack_frame_size;
+
+        return element;
       }
     );
   }
@@ -74,7 +96,7 @@ void TypeValueBase<Derived>::__InitializeBase() {
 
       pointer->PushStackFrameBack(symbol_table);
       // Code generation
-      symbol_table->AppendCode("sss", "mov", pointer->GetIndirectAddress(), lhs->GetAddress());
+      symbol_table->AppendInstruction("sss", "mov", pointer->GetIndirectAddress(), lhs->GetAddress());
 
       return pointer;
     }

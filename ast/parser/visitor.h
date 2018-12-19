@@ -163,6 +163,7 @@ struct Visitor {
   void Visit(IdentifierExpressionNode *node) {
     node->identifier->Accept(this);
     type_value = symbol_table->GetSymbol(identifier);
+    assert_type_value(type_value);
   }
   
   void Visit(ArrayExpressionNode *node) {
@@ -172,6 +173,21 @@ struct Visitor {
     node->index->Accept(this);
     TypeValue *rhs = type_value;
     type_value = lhs->ExecuteOperator(Operator::SUBSCRIPT, rhs);
+  }
+  
+  void Visit(CastExpressionNode *node) {
+    node->type_name->Accept(this);
+    TypeValue *cast_type = type_value2;
+    node->expression->Accept(this);
+    TypeValue *castee = type_value;
+    type_value = castee->ExecuteOperator(Operator::CAST, cast_type);
+  }
+  
+  void Visit(TypeNameNode *node) {
+    node->type_specifier->Accept(this);
+    node->abstract_declarator->Accept(this);
+    // result
+    // type_value2 : target TypeValue
   }
 
   void Visit(NewExpressionNode *node) {
@@ -194,7 +210,7 @@ struct Visitor {
     TypeValue *dereferenced = pointer->content_type_value->Clone();
     dereferenced->refffffff = true;
     
-    symbol_table->AppendCode("ss", "push", pointer->GetIndirectAddress());
+    symbol_table->AppendInstruction("ss", "push", pointer->GetIndirectAddress());
     dereferenced->local_symbol_table = symbol_table;
     dereferenced->stack_frame_offset = ++symbol_table->stack_frame_size;
     type_value = dereferenced;
@@ -220,13 +236,62 @@ struct Visitor {
     type_value = node->type_value;
     Integer *integer = static_cast<Integer*>(type_value);
     symbol_table->PushStackFrameBack(type_value);
-    symbol_table->AppendCode("ssd", "mov", "(esp)", integer->value);
+    symbol_table->AppendInstruction("ssd", "mov", "(esp)", integer->value);
+  }
+
+  void Visit(AsyncExpressionNode *node) {
+    Async *async = new Async();
+
+    symbol_table->PushStackFrameBack(async);
+    symbol_table->AppendInstruction("s", "thread");
+    symbol_table->AppendInstruction("sss", "mov", async->GetIndirectAddress(), "eax");
+
+    /* push captures */
+    Node *vcap = node->variable_capture_list;
+    vector<Identifier*> variable_capture_identifier_list;
+    while (vcap) {
+      vcap->Accept(this);
+      async->variable_capture_list.push_back(type_value);
+      variable_capture_identifier_list.push_back(identifier);
+      symbol_table->AppendInstruction("sss", "pusht", async->GetIndirectAddress(), type_value->GetIndirectAddress());
+      vcap = vcap->next;
+    }
+
+    symbol_table->AppendInstruction("ssd", "mov", async->GetIndirectAddress(1), root_symbol_table->instruction_size);
+
+    // save current symbol table
+    // since async is an isolated scope
+    SymbolTable *saved = symbol_table;
+
+    root_symbol_table->Push();
+    symbol_table->AppendLabel("s", string("async_start" + std::to_string(node->id) + ":").c_str());
+
+    /* capture symbol table */
+    int pdecl_offset = 1;
+    for (int i = async->variable_capture_list.size() - 1; i >= 0; i --) {
+      Identifier *capture_identifier = variable_capture_identifier_list[i];
+      TypeValue *capture_type_value = async->variable_capture_list[i];
+      TypeValue *cloned = capture_type_value->Clone();
+      cloned->local_symbol_table = symbol_table;
+      cloned->stack_frame_offset = -pdecl_offset++;
+      symbol_table->AddSymbol(capture_identifier, cloned);
+      cout << "[Capture] " << capture_identifier->id << " " << TypeToString(cloned->type()) << endl;
+    }
+
+    symbol_table->SaveBasePointer();
+    node->compound_statement->Accept(this);
+    symbol_table->AppendInstruction("ss", "jmp", "__end");
+    symbol_table->Pop();
+
+    symbol_table = saved; // restore
+
+    type_value = async;
   }
 
   void Visit(FunctionCallExpressionNode *node) {
     node->identifier->Accept(this);
-    Function *function = dynamic_cast<Function*>(symbol_table->GetSymbol(identifier));
-    assert(function);
+    assert_type(type_value, Type::FUNCTION);
+    Function *function = dynamic_cast<Function*>(type_value);
     TypeValue *return_type_value = function->return_type_value->Clone();
     assert(return_type_value);
     vector<TypeValue*> arg_list;
@@ -239,8 +304,22 @@ struct Visitor {
     symbol_table->PushStackFrameBack(return_type_value);
     for (auto& arg : arg_list)
       symbol_table->PushStackFrameBack(arg);
-    symbol_table->AppendCode("ss", "call", function->identifier->id.c_str());
+    symbol_table->AppendInstruction("ss", "call", function->identifier->id.c_str());
     type_value = return_type_value;
+  }
+
+  void Visit(RunStatementNode *node) {
+    node->expression->Accept(this);
+    assert_type(type_value, Type::ASYNC);
+    Async *async = static_cast<Async*>(type_value);
+    symbol_table->AppendInstruction("sss", "run", async->GetIndirectAddress(), "# run thread");
+  }
+
+  void Visit(JoinStatementNode *node) {
+    node->expression->Accept(this);
+    assert_type(type_value, Type::ASYNC);
+    Async *async = static_cast<Async*>(type_value);
+    symbol_table->AppendInstruction("sss", "join", async->GetIndirectAddress(), "# join thread");
   }
 
   void Visit(FunctionDefinitionNode *node) {
@@ -253,15 +332,15 @@ struct Visitor {
     symbol_table->AddSymbol(function_identifier, function);
 
     // label
-    symbol_table->AppendCode("s", string(function_identifier->id + ":").c_str());
-    symbol_table->SaveBasePointer();
     symbol_table->Push("Function " + function_identifier->id);
+    symbol_table->AppendLabel("s", string(function_identifier->id + ":").c_str());
+    symbol_table->SaveBasePointer();
 
     int pdecl_offset = 2;
     while (pdecl) {
       pdecl->Accept(this);
       Identifier *fn_parameter_identifier = identifier;
-      TypeValue *fn_parameter_type_value = type_value;
+      TypeValue *fn_parameter_type_value = type_value2;
       FunctionParameter *fn_parameter =
           new FunctionParameter(fn_parameter_identifier, fn_parameter_type_value);
       fn_parameter_type_value->local_symbol_table = symbol_table;
@@ -281,6 +360,8 @@ struct Visitor {
     CompoundStatementNode *function_compound_statement 
         = static_cast<CompoundStatementNode*>(statement);
 
+    symbol_table->ClearStackFrame();
+    symbol_table->RestoreBasePointer();
     symbol_table->Pop();
   }
 
@@ -295,7 +376,7 @@ struct Visitor {
       TypeValue *return_value = type_value;
       TypeValue *return_value_address = symbol_table->GetSymbol(new Identifier("return"));
       assert(return_value_address);
-      symbol_table->AppendCode("ssss", "mov",
+      symbol_table->AppendInstruction("ssss", "mov",
           return_value_address->GetIndirectAddress(), return_value->GetIndirectAddress(),
           "# set return value");
     }
@@ -320,14 +401,14 @@ struct Visitor {
   void Visit(IterationStatementNode *node) {
     symbol_table->SaveBasePointer();
     symbol_table->Push("Iteration");
-    symbol_table->AppendCode("ssd", "loop_start:", "# while", node->id);
+    symbol_table->AppendLabel("ssd", string("loop_start" + std::to_string(node->id) + ":").c_str(), "# while", node->id);
     node->cond->Accept(this);
-    symbol_table->AppendCode("ssd", "cmp", type_value->GetIndirectAddress(), 0);
-    symbol_table->AppendCode("ss", "je", "loop_end");
+    symbol_table->AppendInstruction("ssd", "cmp", type_value->GetIndirectAddress(), 0);
+    symbol_table->AppendInstruction("ss", "je", string("loop_end" + std::to_string(node->id)).c_str());
     node->stmt->Accept(this);
     symbol_table->ClearStackFrame();
-    symbol_table->AppendCode("ss", "jmp", "loop_start");
-    symbol_table->AppendCode("ssd", "loop_end:", "# end of while", node->id);
+    symbol_table->AppendInstruction("ss", "jmp", string("loop_start" + std::to_string(node->id)).c_str());
+    symbol_table->AppendLabel("ssd", string("loop_end" + std::to_string(node->id) + ":").c_str(), "# end of while", node->id);
     symbol_table->RestoreBasePointer();
     symbol_table->Pop();
   }
@@ -339,15 +420,15 @@ struct Visitor {
     if (node->init_expression) node->init_expression->Accept(this);
     if (node->init_declaration) node->init_declaration->Accept(this);
 
-    symbol_table->AppendCode("ssd", "loop_start:", "# for", node->id);
+    symbol_table->AppendLabel("ssd", string("loop_start" + std::to_string(node->id) + ":").c_str(), "# for", node->id);
     symbol_table->SaveBasePointer();
     symbol_table->Push(); // condition stack frame
     node->condition->Accept(this);
-    symbol_table->AppendCode("ssd", "cmp", type_value->GetIndirectAddress(), 0);
+    symbol_table->AppendInstruction("ssd", "cmp", type_value->GetIndirectAddress(), 0);
     symbol_table->ClearStackFrame(); // clear condition stack frame
     symbol_table->RestoreBasePointer();
     symbol_table->Pop();
-    symbol_table->AppendCode("ss", "je", "loop_end");
+    symbol_table->AppendInstruction("ss", "je", string("loop_end" + std::to_string(node->id)).c_str());
 
     symbol_table->SaveBasePointer();
     symbol_table->Push(); // iterator & statement stack frame
@@ -356,8 +437,8 @@ struct Visitor {
     symbol_table->ClearStackFrame(); // clear iterator & statement
     symbol_table->RestoreBasePointer();
     symbol_table->Pop();
-    symbol_table->AppendCode("ss", "jmp", "loop_start");
-    symbol_table->AppendCode("ssd", "loop_end:", "# end of for", node->id);
+    symbol_table->AppendInstruction("ss", "jmp", string("loop_start" + std::to_string(node->id)).c_str());
+    symbol_table->AppendLabel("ssd", string("loop_end" + std::to_string(node->id) + ":").c_str(), "# end of for", node->id);
 
     symbol_table->ClearStackFrame(); // clear initializer
     symbol_table->RestoreBasePointer();
@@ -366,8 +447,8 @@ struct Visitor {
 
   void Visit(SelectionStatementNode *node) {
     node->cond->Accept(this);
-    symbol_table->AppendCode("ssdsd", "cmp", type_value->GetIndirectAddress(), 0, "# if", node->id);
-    symbol_table->AppendCode("ss", "je", "else_start");
+    symbol_table->AppendInstruction("ssdsd", "cmp", type_value->GetIndirectAddress(), 0, "# if", node->id);
+    symbol_table->AppendInstruction("ss", "je", string("else_start" + std::to_string(node->id)).c_str());
 
     // if
     symbol_table->SaveBasePointer();
@@ -376,22 +457,22 @@ struct Visitor {
     symbol_table->ClearStackFrame();
     symbol_table->RestoreBasePointer();
     symbol_table->Pop();
-    symbol_table->AppendCode("ss", "jump", "if_end");
+    symbol_table->AppendInstruction("ss", "jmp", string("if_end" + std::to_string(node->id)).c_str());
     
     // else
-    symbol_table->AppendCode("s", "else_start:");
+    symbol_table->AppendLabel("s", string("else_start" + std::to_string(node->id) + ":").c_str());
     symbol_table->SaveBasePointer();
     symbol_table->Push("Selection Else");
     if (node->stmt2) node->stmt2->Accept(this);
     symbol_table->ClearStackFrame();
     symbol_table->RestoreBasePointer();
     symbol_table->Pop();
-    symbol_table->AppendCode("ssd", "if_end:", "# end of if", node->id);
+    symbol_table->AppendLabel("ssd", string("if_end" + std::to_string(node->id) + ":").c_str(), "# end of if", node->id);
   }
 
   void Visit(PrintStatementNode *node) {
     node->expression->Accept(this);
-    symbol_table->AppendCode("ss", "prn", type_value->GetIndirectAddress());
+    symbol_table->AppendInstruction("ss", "prn", type_value->GetIndirectAddress());
   }
 
 };

@@ -5,11 +5,11 @@
 #include "ast/statement/compound_statement.h"
 
 struct AsyncExpressionNode : ExpressionNode {
-  ExpressionNode *variable_capture_expression;
+  ExpressionNode *variable_capture_list;
   CompoundStatementNode *compound_statement;
   
   inline AsyncExpressionNode(ExpressionNode *vcap, CompoundStatementNode *cs) {
-    variable_capture_expression = vcap;
+    variable_capture_list = vcap;
     compound_statement = cs;
   }
   
@@ -20,7 +20,7 @@ struct AsyncExpressionNode : ExpressionNode {
     indent();
     cout << "[VariableCapture]\n";
     ii();
-    Node* exp = variable_capture_expression;
+    Node* exp = variable_capture_list;
     while (exp) {
       exp->Print();
       exp = exp->next;

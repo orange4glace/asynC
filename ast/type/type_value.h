@@ -14,7 +14,8 @@ struct SymbolTable;
 struct TypeValue {
 
   bool refffffff;
-
+  
+  int size;
   bool lvalue;
   int stack_frame_offset;
   SymbolTable *local_symbol_table;
@@ -25,6 +26,7 @@ struct TypeValue {
   inline TypeValue() : local_symbol_table(nullptr) {
     refffffff = false;
     index_base = index_offset = nullptr;
+    size = 1;
   }
 
   virtual TypeValue* Clone() = 0;
@@ -44,7 +46,7 @@ struct TypeValue {
     return str;
   }
 
-  const char* GetIndirectAddress();
+  const char* GetIndirectAddress(int offset = 0);
   const char* GetAddress();
   virtual void PushStackFrameBack(SymbolTable *symbol_table);
 

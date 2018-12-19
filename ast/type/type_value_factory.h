@@ -7,6 +7,7 @@
 #include "void.h"
 #include "array.h"
 #include "pointer.h"
+#include "async.h"
 
 struct TypeValueFactory {
 
@@ -16,6 +17,8 @@ struct TypeValueFactory {
       return new Integer();
     case Type::VOID:
       return new Void();
+    case Type::ASYNC:
+      return new Async();
     }
     return nullptr;
   }

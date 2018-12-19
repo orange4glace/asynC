@@ -22,7 +22,7 @@ struct Integer : TypeValueBase<Integer> {
         lhs->value = rhs->value;
 
         // Code generation
-        symbol_table->AppendCode("sss",
+        symbol_table->AppendInstruction("sss",
             "mov", lhs->GetIndirectAddress(), rhs->GetIndirectAddress());
 
         return lhs;
@@ -37,9 +37,9 @@ struct Integer : TypeValueBase<Integer> {
         Integer* res = new Integer();
         // Code generation
         symbol_table->PushStackFrameBack(res);
-        symbol_table->AppendCode("sss",
+        symbol_table->AppendInstruction("sss",
             "mov", res->GetIndirectAddress(), l->GetIndirectAddress());
-        symbol_table->AppendCode("sss",
+        symbol_table->AppendInstruction("sss",
             "add", res->GetIndirectAddress(), r->GetIndirectAddress());
 
         return res;
@@ -54,9 +54,9 @@ struct Integer : TypeValueBase<Integer> {
         Integer* res = new Integer();
         // Code generation
         symbol_table->PushStackFrameBack(res);
-        symbol_table->AppendCode("sss",
+        symbol_table->AppendInstruction("sss",
             "mov", res->GetIndirectAddress(), l->GetIndirectAddress());
-        symbol_table->AppendCode("sss",
+        symbol_table->AppendInstruction("sss",
             "sub", res->GetIndirectAddress(), r->GetIndirectAddress());
 
         return res;
@@ -71,9 +71,9 @@ struct Integer : TypeValueBase<Integer> {
         Integer* res = new Integer();
         // Code generation
         symbol_table->PushStackFrameBack(res);
-        symbol_table->AppendCode("sss",
+        symbol_table->AppendInstruction("sss",
             "mov", res->GetIndirectAddress(), l->GetIndirectAddress());
-        symbol_table->AppendCode("sss",
+        symbol_table->AppendInstruction("sss",
             "mul", res->GetIndirectAddress(), r->GetIndirectAddress());
 
         return res;
@@ -88,9 +88,9 @@ struct Integer : TypeValueBase<Integer> {
         Integer* res = new Integer();
         // Code generation
         symbol_table->PushStackFrameBack(res);
-        symbol_table->AppendCode("sss",
+        symbol_table->AppendInstruction("sss",
             "mov", res->GetIndirectAddress(), l->GetIndirectAddress());
-        symbol_table->AppendCode("sss",
+        symbol_table->AppendInstruction("sss",
             "div", res->GetIndirectAddress(), r->GetIndirectAddress());
 
         return res;
@@ -105,9 +105,9 @@ struct Integer : TypeValueBase<Integer> {
         Integer* res = new Integer();
         // Code generation
         symbol_table->PushStackFrameBack(res);
-        symbol_table->AppendCode("sss",
+        symbol_table->AppendInstruction("sss",
             "mov", res->GetIndirectAddress(), l->GetIndirectAddress());
-        symbol_table->AppendCode("sss",
+        symbol_table->AppendInstruction("sss",
             "mod", res->GetIndirectAddress(), r->GetIndirectAddress());
 
         return res;
@@ -122,9 +122,9 @@ struct Integer : TypeValueBase<Integer> {
         Integer* res = new Integer();
         // Code generation
         symbol_table->PushStackFrameBack(res);
-        symbol_table->AppendCode("sss",
+        symbol_table->AppendInstruction("sss",
             "cmp", lhs->GetIndirectAddress(), rhs->GetIndirectAddress());
-        symbol_table->AppendCode("ss",
+        symbol_table->AppendInstruction("ss",
             "sete", res->GetIndirectAddress());
 
         return res;
@@ -139,9 +139,9 @@ struct Integer : TypeValueBase<Integer> {
         Integer* res = new Integer();
         // Code generation
         symbol_table->PushStackFrameBack(res);
-        symbol_table->AppendCode("sss",
+        symbol_table->AppendInstruction("sss",
             "cmp", lhs->GetIndirectAddress(), rhs->GetIndirectAddress());
-        symbol_table->AppendCode("ss",
+        symbol_table->AppendInstruction("ss",
             "setne", res->GetIndirectAddress());
 
         return res;
@@ -156,9 +156,9 @@ struct Integer : TypeValueBase<Integer> {
         Integer* res = new Integer();
         // Code generation
         symbol_table->PushStackFrameBack(res);
-        symbol_table->AppendCode("sss",
+        symbol_table->AppendInstruction("sss",
             "cmp", lhs->GetIndirectAddress(), rhs->GetIndirectAddress());
-        symbol_table->AppendCode("ss",
+        symbol_table->AppendInstruction("ss",
             "setg", res->GetIndirectAddress());
 
         return res;
@@ -173,9 +173,9 @@ struct Integer : TypeValueBase<Integer> {
         Integer* res = new Integer();
         // Code generation
         symbol_table->PushStackFrameBack(res);
-        symbol_table->AppendCode("sss",
+        symbol_table->AppendInstruction("sss",
             "cmp", lhs->GetIndirectAddress(), rhs->GetIndirectAddress());
-        symbol_table->AppendCode("ss",
+        symbol_table->AppendInstruction("ss",
             "setge", res->GetIndirectAddress());
 
         return res;
@@ -190,9 +190,9 @@ struct Integer : TypeValueBase<Integer> {
         Integer* res = new Integer();
         // Code generation
         symbol_table->PushStackFrameBack(res);
-        symbol_table->AppendCode("sss",
+        symbol_table->AppendInstruction("sss",
             "cmp", lhs->GetIndirectAddress(), rhs->GetIndirectAddress());
-        symbol_table->AppendCode("ss",
+        symbol_table->AppendInstruction("ss",
             "setl", res->GetIndirectAddress());
 
         return res;
@@ -207,9 +207,9 @@ struct Integer : TypeValueBase<Integer> {
         Integer* res = new Integer();
         // Code generation
         symbol_table->PushStackFrameBack(res);
-        symbol_table->AppendCode("sss",
+        symbol_table->AppendInstruction("sss",
             "cmp", lhs->GetIndirectAddress(), rhs->GetIndirectAddress());
-        symbol_table->AppendCode("ss",
+        symbol_table->AppendInstruction("ss",
             "setle", res->GetIndirectAddress());
 
         return res;
@@ -221,7 +221,7 @@ struct Integer : TypeValueBase<Integer> {
         Integer* lhs = static_cast<Integer*>(l);
 
         // Code generation
-        symbol_table->AppendCode("ssd",
+        symbol_table->AppendInstruction("ssd",
             "add", l->GetIndirectAddress(), 1);
 
         return lhs;
@@ -233,7 +233,7 @@ struct Integer : TypeValueBase<Integer> {
         Integer* lhs = static_cast<Integer*>(l);
 
         // Code generation
-        symbol_table->AppendCode("ssd",
+        symbol_table->AppendInstruction("ssd",
             "sub", l->GetIndirectAddress(), 1);
 
         return lhs;
@@ -247,9 +247,9 @@ struct Integer : TypeValueBase<Integer> {
         Integer *res = new Integer();
         // Code generation
         symbol_table->PushStackFrameBack(res);
-        symbol_table->AppendCode("sss",
+        symbol_table->AppendInstruction("sss",
             "mov", res->GetIndirectAddress(), l->GetIndirectAddress());
-        symbol_table->AppendCode("ssd",
+        symbol_table->AppendInstruction("ssd",
             "add", l->GetIndirectAddress(), 1);
 
         return res;
@@ -263,9 +263,9 @@ struct Integer : TypeValueBase<Integer> {
         Integer *res = new Integer();
         // Code generation
         symbol_table->PushStackFrameBack(res);
-        symbol_table->AppendCode("sss",
+        symbol_table->AppendInstruction("sss",
             "mov", res->GetIndirectAddress(), l->GetIndirectAddress());
-        symbol_table->AppendCode("ssd",
+        symbol_table->AppendInstruction("ssd",
             "sub", l->GetIndirectAddress(), 1);
 
         return res;

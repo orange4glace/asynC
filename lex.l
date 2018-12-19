@@ -54,6 +54,8 @@ int comment();
 "while"     { count(); return(WHILE); }
 "print"     { count(); return(PRINT); }
 "new"     { count(); return(NEW); }
+"run"     { count(); return(RUN); }
+"join"     { count(); return(JOIN); }
 
 {L}({L}|{D})*   { count(); return(check_type()); }
 
