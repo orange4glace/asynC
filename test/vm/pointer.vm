@@ -1,5 +1,5 @@
 main:
-push ebp # save base pointer 75
+push ebp # save base pointer 89
 mov ebp esp
 push 0 #  INTEGER
 mov (esp) 10
@@ -21,15 +21,15 @@ add esi -2
 push esi
 mov -13(ebp) -14(ebp) # array -> pointer
 mov -12(ebp) -13(ebp)
-push ebp # save base pointer 75
+push ebp # save base pointer 89
 mov ebp esp
-# for loop initiailzer 50
+# for loop initiailzer 63
 push 0 #  INTEGER
 push 0 #  INTEGER
 mov (esp) 0
 mov -1(ebp) -2(ebp)
-loop_start50: # for 50
-push ebp # save base pointer 76
+loop_start63: # for 63
+push ebp # save base pointer 90
 mov ebp esp
 push 0 #  INTEGER
 mov (esp) 10
@@ -38,34 +38,43 @@ cmp 2(ebp) -1(ebp)
 setl -2(ebp)
 cmp -2(ebp) 0
 add esp 8
-pop ebp # restore base pointer 76
-je loop_end50
-push ebp # save base pointer 76
+pop ebp # restore base pointer 90
+je loop_end63
+push ebp # save base pointer 90
 mov ebp esp
+malloc
+push eax # Pointer created by _new_
 mov ecx 6(ebp) # get subscript base address
 mov edx 2(ebp)
 mul edx 1
 sub ecx edx # add subscript offset
 push ecx # subscript element
-mov -1{ebp} 2(ebp)
+mov -2{ebp} -1(ebp)
+mov ecx 6(ebp) # get subscript base address
+mov edx 2(ebp)
+mul edx 1
+sub ecx edx # add subscript offset
+push ecx # subscript element
+push -3{ebp}
+mov -4{ebp} 2(ebp)
 push 0 #  INTEGER
-mov -2(ebp) 2(ebp)
+mov -5(ebp) 2(ebp)
 add 2(ebp) 1
+add esp 20
+pop ebp # restore base pointer 90
+jmp loop_start63
+loop_end63: # end of for 63
 add esp 8
-pop ebp # restore base pointer 76
-jmp loop_start50
-loop_end50: # end of for 50
-add esp 8
-pop ebp # restore base pointer 75
-push ebp # save base pointer 75
+pop ebp # restore base pointer 89
+push ebp # save base pointer 89
 mov ebp esp
-# for loop initiailzer 72
+# for loop initiailzer 86
 push 0 #  INTEGER
 push 0 #  INTEGER
 mov (esp) 0
 mov -1(ebp) -2(ebp)
-loop_start72: # for 72
-push ebp # save base pointer 79
+loop_start86: # for 86
+push ebp # save base pointer 93
 mov ebp esp
 push 0 #  INTEGER
 mov (esp) 10
@@ -74,9 +83,9 @@ cmp 2(ebp) -1(ebp)
 setl -2(ebp)
 cmp -2(ebp) 0
 add esp 8
-pop ebp # restore base pointer 79
-je loop_end72
-push ebp # save base pointer 79
+pop ebp # restore base pointer 93
+je loop_end86
+push ebp # save base pointer 93
 mov ebp esp
 mem esi ebp
 add esi 16
@@ -86,15 +95,16 @@ mov edx 2(ebp)
 mul edx 1
 sub ecx edx # add subscript offset
 push ecx # subscript element
-prn -2{ebp}
+push -2{ebp}
+prn -3{ebp}
 push 0 #  INTEGER
-mov -3(ebp) 2(ebp)
+mov -4(ebp) 2(ebp)
 add 2(ebp) 1
-add esp 12
-pop ebp # restore base pointer 79
-jmp loop_start72
-loop_end72: # end of for 72
+add esp 16
+pop ebp # restore base pointer 93
+jmp loop_start86
+loop_end86: # end of for 86
 add esp 8
-pop ebp # restore base pointer 75
+pop ebp # restore base pointer 89
 add esp 56
 pop ebp # restore base pointer 0
