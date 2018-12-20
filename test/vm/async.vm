@@ -1,0 +1,77 @@
+push 0 #  ASYNC
+push 0
+async_start51:
+push ebp # save base pointer 61
+mov ebp esp
+push ebp # save base pointer 61
+mov ebp esp
+loop_start49: # while 49
+push 0 #  INTEGER
+mov -1(ebp) 2(ebp)
+sub 2(ebp) 1
+cmp -1(ebp) 0
+je loop_end49
+push 3(ebp)
+push 0 #  INTEGER
+mov -3(ebp) -2{ebp}
+add -3(ebp) 2(ebp)
+push 3(ebp)
+mov -4{ebp} -3(ebp)
+add esp 16
+jmp loop_start49
+loop_end49: # end of while 49
+pop ebp # restore base pointer 61
+jmp __end
+start_work:
+push ebp # save base pointer 60
+mov ebp esp
+push 0 #  ASYNC
+push 0
+thread
+mov -1(ebp) eax
+pusht -1(ebp) 4(ebp)
+pusht -1(ebp) 3(ebp)
+mov -2(ebp) 2
+push 5(ebp)
+# async assignment
+mov -3{ebp} -1(ebp)
+mov esi -3(ebp)
+add esi -1
+push esi
+mov -4{ebp} -2(ebp)
+push 5(ebp)
+run -5{ebp} # run thread
+add esp 20
+pop ebp
+ret
+add esp 20
+pop ebp # restore base pointer 0
+main:
+push ebp # save base pointer 93
+mov ebp esp
+push 0 #  INTEGER
+push 0 #  INTEGER
+mov (esp) 0
+mov -1(ebp) -2(ebp)
+push 0 #  POINTER
+mem esi ebp
+add esi 2
+push esi
+mov -3(ebp) -4(ebp)
+push 0 #  POINTER
+mem esi ebp
+add esi -1
+push esi
+mov -5(ebp) -6(ebp)
+push 0 #  INTEGER
+mov (esp) 10
+push -3(ebp)
+push -5(ebp)
+push -7(ebp)
+push 0 #  VOID
+call start_work
+join 2(ebp) # join thread
+prn -1(ebp)
+add esp 44
+pop ebp # restore base pointer 0
+__end:

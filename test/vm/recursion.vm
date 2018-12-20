@@ -1,0 +1,57 @@
+gcd:
+push ebp # save base pointer 36
+mov ebp esp
+push 0 #  INTEGER
+mov (esp) 0
+push 0 #  INTEGER
+cmp 3(ebp) -1(ebp)
+sete -2(ebp)
+cmp -2(ebp) 0 # if 33
+je else_start33
+push ebp # save base pointer 36
+mov ebp esp
+mov 5(ebp) 7(ebp) # set return value
+add esp 0
+pop ebp # restore base pointer 36
+add esp 8
+pop ebp
+ret
+add esp 0
+pop ebp # restore base pointer 36
+jmp if_end33
+else_start33:
+push ebp # save base pointer 36
+mov ebp esp
+push 0 #  INTEGER
+mov -1(ebp) 7(ebp)
+mod -1(ebp) 6(ebp)
+rem -1(ebp)
+push 6(ebp)
+push -1(ebp)
+push 0 #  INTEGER
+call gcd
+mov 5(ebp) -4(ebp) # set return value
+add esp 16
+pop ebp # restore base pointer 36
+add esp 8
+pop ebp
+ret
+add esp 16
+pop ebp # restore base pointer 36
+if_end33: # end of if 33
+add esp 8
+pop ebp # restore base pointer 0
+main:
+push ebp # save base pointer 71
+mov ebp esp
+push 0 #  INTEGER
+push 0 #  INTEGER
+inp -1(ebp)
+inp -2(ebp)
+push -1(ebp)
+push -2(ebp)
+push 0 #  INTEGER
+call gcd
+prn -5(ebp)
+add esp 20
+pop ebp # restore base pointer 0

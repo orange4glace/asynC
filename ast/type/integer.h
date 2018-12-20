@@ -109,6 +109,8 @@ struct Integer : TypeValueBase<Integer> {
             "mov", res->GetIndirectAddress(), l->GetIndirectAddress());
         symbol_table->AppendInstruction("sss",
             "mod", res->GetIndirectAddress(), r->GetIndirectAddress());
+        symbol_table->AppendInstruction("ss",
+            "rem", res->GetIndirectAddress());
 
         return res;
       }

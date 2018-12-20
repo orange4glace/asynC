@@ -56,7 +56,7 @@ void yyerror(char * s);
     argument_expression_list constant_expression async_expression new_expression
     variable_capture_list variable_capture
 %type <statement> statement expression_statement compound_statement selection_statement iteration_statement for_statement
-    return_statement print_statement async_statement
+    return_statement print_statement input_statement async_statement
 %type <function_definition> function_definition
 %type <parameter_declaration> parameter_declaration_list parameter_declaration
 %type <type_name> type_name
@@ -75,7 +75,7 @@ void yyerror(char * s);
 %token CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE CONST VOLATILE VOID ASYNC
 %token STRUCT UNION ENUM ELLIPSIS
 
-%token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN PRINT NEW RUN JOIN
+%token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN PRINT INPUT NEW RUN JOIN
 
 %start translation_unit
 %%
@@ -525,6 +525,7 @@ statement
   | selection_statement { $$ = $1; }
   | return_statement { $$ = $1; }
   | print_statement { $$ = $1; }
+  | input_statement { $$ = $1; }
   | async_statement { $$ = $1; }
   | expression_statement { $$ = $1; }
   ;
@@ -646,6 +647,12 @@ print_statement
   : PRINT expression ';'
   {
     $$ = new PrintStatementNode($2);
+  }
+
+input_statement
+  : INPUT expression ';'
+  {
+    $$ = new InputStatementNode($2);
   }
 
 external_declaration 

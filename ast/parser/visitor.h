@@ -301,9 +301,9 @@ struct Visitor {
       arg_list.push_back(type_value);
       arg = arg->next;
     }
-    symbol_table->PushStackFrameBack(return_type_value);
     for (auto& arg : arg_list)
       symbol_table->PushStackFrameBack(arg);
+    symbol_table->PushStackFrameBack(return_type_value);
     symbol_table->AppendInstruction("ss", "call", function->identifier->id.c_str());
     type_value = return_type_value;
   }
@@ -328,7 +328,7 @@ struct Visitor {
     TypeValue *return_type = function->return_type_value = type_value;
     node->declarator->Accept(this);
     Identifier *function_identifier = function->identifier = identifier;
-    ParameterDeclarationNode *pdecl = node->parameter_declaration_list;
+    Node *pdecl = node->parameter_declaration_list;
     symbol_table->AddSymbol(function_identifier, function);
 
     // label
@@ -336,7 +336,19 @@ struct Visitor {
     symbol_table->AppendLabel("s", string(function_identifier->id + ":").c_str());
     symbol_table->SaveBasePointer();
 
+    // return value
+    Identifier *return_identifier = new Identifier("return");
+    symbol_table->AddSymbol(return_identifier, return_type);
+    return_type->local_symbol_table = symbol_table;
+    return_type->stack_frame_offset = -2;
+    
     int pdecl_offset = 2;
+    // count parameters
+    while (pdecl) {
+      pdecl = pdecl->next;
+      pdecl_offset++;
+    }
+    pdecl = node->parameter_declaration_list;
     while (pdecl) {
       pdecl->Accept(this);
       Identifier *fn_parameter_identifier = identifier;
@@ -344,17 +356,11 @@ struct Visitor {
       FunctionParameter *fn_parameter =
           new FunctionParameter(fn_parameter_identifier, fn_parameter_type_value);
       fn_parameter_type_value->local_symbol_table = symbol_table;
-      fn_parameter_type_value->stack_frame_offset = -pdecl_offset++;
+      fn_parameter_type_value->stack_frame_offset = -pdecl_offset--;
       symbol_table->AddSymbol(fn_parameter_identifier, fn_parameter_type_value);
       function->parameters.push_back(fn_parameter);
-      pdecl = static_cast<ParameterDeclarationNode*>(pdecl->next);
+      pdecl = pdecl->next;
     }
-
-    // return value
-    Identifier *return_identifier = new Identifier("return");
-    symbol_table->AddSymbol(return_identifier, return_type);
-    return_type->local_symbol_table = symbol_table;
-    return_type->stack_frame_offset = -pdecl_offset++;
     
     node->compound_statement->Accept(this);
     CompoundStatementNode *function_compound_statement 
@@ -380,9 +386,11 @@ struct Visitor {
           return_value_address->GetIndirectAddress(), return_value->GetIndirectAddress(),
           "# set return value");
     }
+    cout << "Find Function table " << endl;
     SymbolTable *return_symbol_table = symbol_table->GetLocalSymbolTable(new Identifier("return"));
     SymbolTable *target_symbol_table = symbol_table;
     while (target_symbol_table != return_symbol_table) {
+      cout << "jump " << endl;
       target_symbol_table->ClearStackFrame();
       target_symbol_table->RestoreBasePointer();
       target_symbol_table = target_symbol_table->parent;
@@ -473,6 +481,11 @@ struct Visitor {
   void Visit(PrintStatementNode *node) {
     node->expression->Accept(this);
     symbol_table->AppendInstruction("ss", "prn", type_value->GetIndirectAddress());
+  }
+
+  void Visit(InputStatementNode *node) {
+    node->expression->Accept(this);
+    symbol_table->AppendInstruction("ss", "inp", type_value->GetIndirectAddress());
   }
 
 };

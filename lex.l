@@ -56,6 +56,7 @@ int comment();
 "new"     { count(); return(NEW); }
 "run"     { count(); return(RUN); }
 "join"     { count(); return(JOIN); }
+"input"    { count(); return(INPUT); }
 
 {L}({L}|{D})*   { count(); return(check_type()); }
 
