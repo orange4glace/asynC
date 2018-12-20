@@ -10,8 +10,12 @@ $./build.bat (flex&bison library path)
 
 ex) ./build.bat d:/cpplib/GnuWin32/lib
 
+# Run
 
-# Running instructions
+$./lex.exe
+$(Input your code)
+
+# Run a generated code on VM
 
 ## Prerequisite
 
