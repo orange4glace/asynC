@@ -20,12 +20,8 @@ struct TypeValue {
   int stack_frame_offset;
   SymbolTable *local_symbol_table;
 
-  TypeValue *index_base;
-  TypeValue *index_offset;
-
   inline TypeValue() : local_symbol_table(nullptr) {
     refffffff = false;
-    index_base = index_offset = nullptr;
     size = 1;
   }
 
