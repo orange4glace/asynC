@@ -22,4 +22,6 @@ $(Input your code)
 - [TinyVM for asynC](https://github.com/orange4glace/tinyvm)
 
 ## To run
-$./tinyvm.exe (your code)
+$./tinyvm.exe (path of the program)
+
+# [Precompiled executable file](https://drive.google.com/open?id=1z-rpd8iN5Ifsv4f8PzwNT0O4JQdwhumM)
