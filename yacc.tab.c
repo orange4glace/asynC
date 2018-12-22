@@ -74,6 +74,7 @@
 #include <string>
 #include <stdlib.h>
 #include <map>
+#include <algorithm>
 #include <list>
 #include "ast/ast.h"
 #include "ast/parser/visitor.h"
@@ -88,7 +89,7 @@ void yyerror(char * s);
 
 
 /* Line 189 of yacc.c  */
-#line 92 "yacc.tab.c"
+#line 93 "yacc.tab.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -189,7 +190,7 @@ typedef union YYSTYPE
 {
 
 /* Line 214 of yacc.c  */
-#line 19 "yacc.y"
+#line 20 "yacc.y"
 
   int num;
   char* id;
@@ -214,7 +215,7 @@ typedef union YYSTYPE
 
 
 /* Line 214 of yacc.c  */
-#line 218 "yacc.tab.c"
+#line 219 "yacc.tab.c"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -226,7 +227,7 @@ typedef union YYSTYPE
 
 
 /* Line 264 of yacc.c  */
-#line 230 "yacc.tab.c"
+#line 231 "yacc.tab.c"
 
 #ifdef short
 # undef short
@@ -558,17 +559,17 @@ static const yytype_int16 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    84,    84,    89,    93,    97,   101,   108,   112,   119,
-     123,   131,   139,   141,   143,   145,   147,   149,   154,   158,
-     166,   168,   170,   172,   174,   176,   190,   194,   201,   203,
-     210,   214,   218,   222,   229,   233,   237,   244,   248,   252,
-     259,   263,   267,   271,   275,   282,   286,   290,   364,   368,
-     375,   379,   380,   384,   391,   395,   404,   408,   415,   419,
-     423,   427,   434,   439,   446,   450,   459,   463,   471,   480,
-     486,   492,   502,   509,   515,   522,   523,   524,   525,   526,
-     527,   528,   529,   530,   535,   542,   546,   553,   557,   565,
-     572,   576,   583,   587,   591,   596,   604,   608,   614,   620,
-     625,   629,   636,   640,   647,   653,   659,   665,   674,   675
+       0,    85,    85,    90,    94,    98,   102,   109,   113,   120,
+     124,   132,   140,   142,   144,   146,   148,   150,   155,   159,
+     167,   169,   171,   173,   175,   177,   191,   195,   202,   204,
+     211,   215,   219,   223,   230,   234,   238,   245,   249,   253,
+     260,   264,   268,   272,   276,   283,   287,   291,   365,   369,
+     376,   380,   381,   385,   392,   396,   405,   409,   416,   420,
+     424,   428,   435,   440,   447,   451,   460,   464,   472,   481,
+     487,   493,   503,   510,   516,   523,   524,   525,   526,   527,
+     528,   529,   530,   531,   536,   543,   547,   554,   558,   566,
+     573,   577,   584,   588,   592,   597,   605,   609,   615,   621,
+     626,   630,   637,   641,   648,   654,   660,   673,   689,   690
 };
 #endif
 
@@ -1653,7 +1654,7 @@ yyreduce:
         case 2:
 
 /* Line 1455 of yacc.c  */
-#line 85 "yacc.y"
+#line 86 "yacc.y"
     {
     (yyval.expression) = new IdentifierExpressionNode(
         new IdentifierNode(yylval.id));
@@ -1663,7 +1664,7 @@ yyreduce:
   case 3:
 
 /* Line 1455 of yacc.c  */
-#line 90 "yacc.y"
+#line 91 "yacc.y"
     {
     (yyval.expression) = new ConstantExpressionNode(yylval.num);
   ;}
@@ -1672,7 +1673,7 @@ yyreduce:
   case 4:
 
 /* Line 1455 of yacc.c  */
-#line 94 "yacc.y"
+#line 95 "yacc.y"
     {
     (yyval.expression) = new StringExpressionNode();
   ;}
@@ -1681,7 +1682,7 @@ yyreduce:
   case 5:
 
 /* Line 1455 of yacc.c  */
-#line 98 "yacc.y"
+#line 99 "yacc.y"
     {
     (yyval.expression) = (yyvsp[(2) - (3)].expression);
   ;}
@@ -1690,7 +1691,7 @@ yyreduce:
   case 6:
 
 /* Line 1455 of yacc.c  */
-#line 102 "yacc.y"
+#line 103 "yacc.y"
     {
     (yyval.expression) = (yyvsp[(1) - (1)].expression);
   ;}
@@ -1699,7 +1700,7 @@ yyreduce:
   case 7:
 
 /* Line 1455 of yacc.c  */
-#line 109 "yacc.y"
+#line 110 "yacc.y"
     {
     (yyval.expression) = new AsyncExpressionNode(nullptr, static_cast<CompoundStatementNode*>((yyvsp[(3) - (3)].statement)));
   ;}
@@ -1708,7 +1709,7 @@ yyreduce:
   case 8:
 
 /* Line 1455 of yacc.c  */
-#line 113 "yacc.y"
+#line 114 "yacc.y"
     {
     (yyval.expression) = new AsyncExpressionNode((yyvsp[(2) - (4)].expression), static_cast<CompoundStatementNode*>((yyvsp[(4) - (4)].statement)));
   ;}
@@ -1717,7 +1718,7 @@ yyreduce:
   case 9:
 
 /* Line 1455 of yacc.c  */
-#line 120 "yacc.y"
+#line 121 "yacc.y"
     {
     (yyval.expression) = (yyvsp[(1) - (1)].expression);
   ;}
@@ -1726,7 +1727,7 @@ yyreduce:
   case 10:
 
 /* Line 1455 of yacc.c  */
-#line 124 "yacc.y"
+#line 125 "yacc.y"
     {
     (yyvsp[(1) - (3)].expression)->next = (yyvsp[(3) - (3)].expression);
     (yyval.expression) = (yyvsp[(1) - (3)].expression);
@@ -1736,7 +1737,7 @@ yyreduce:
   case 11:
 
 /* Line 1455 of yacc.c  */
-#line 132 "yacc.y"
+#line 133 "yacc.y"
     {
     (yyval.expression) = new IdentifierExpressionNode(
         new IdentifierNode(yylval.id));
@@ -1746,49 +1747,49 @@ yyreduce:
   case 12:
 
 /* Line 1455 of yacc.c  */
-#line 140 "yacc.y"
+#line 141 "yacc.y"
     { (yyval.expression) = (yyvsp[(1) - (1)].expression); ;}
     break;
 
   case 13:
 
 /* Line 1455 of yacc.c  */
-#line 142 "yacc.y"
+#line 143 "yacc.y"
     { (yyval.expression) = new ArrayExpressionNode((yyvsp[(1) - (4)].expression), (yyvsp[(3) - (4)].expression)); ;}
     break;
 
   case 14:
 
 /* Line 1455 of yacc.c  */
-#line 144 "yacc.y"
+#line 145 "yacc.y"
     { (yyval.expression) = new FunctionCallExpressionNode((yyvsp[(1) - (4)].expression), (yyvsp[(3) - (4)].expression)); ;}
     break;
 
   case 15:
 
 /* Line 1455 of yacc.c  */
-#line 146 "yacc.y"
+#line 147 "yacc.y"
     { (yyval.expression) = new FunctionCallExpressionNode((yyvsp[(1) - (3)].expression), nullptr); ;}
     break;
 
   case 16:
 
 /* Line 1455 of yacc.c  */
-#line 148 "yacc.y"
+#line 149 "yacc.y"
     { (yyval.expression) = new UnaryExpressionNode(Operator::POSTFIX_INCREMENT, (yyvsp[(1) - (2)].expression)); ;}
     break;
 
   case 17:
 
 /* Line 1455 of yacc.c  */
-#line 150 "yacc.y"
+#line 151 "yacc.y"
     { (yyval.expression) = new UnaryExpressionNode(Operator::POSTFIX_DECREMENT, (yyvsp[(1) - (2)].expression)); ;}
     break;
 
   case 18:
 
 /* Line 1455 of yacc.c  */
-#line 155 "yacc.y"
+#line 156 "yacc.y"
     {
     (yyval.expression) = (yyvsp[(1) - (1)].expression);
   ;}
@@ -1797,7 +1798,7 @@ yyreduce:
   case 19:
 
 /* Line 1455 of yacc.c  */
-#line 159 "yacc.y"
+#line 160 "yacc.y"
     {
     (yyvsp[(1) - (3)].expression)->next = (yyvsp[(3) - (3)].expression);
     (yyval.expression) = (yyvsp[(1) - (3)].expression);
@@ -1807,49 +1808,49 @@ yyreduce:
   case 20:
 
 /* Line 1455 of yacc.c  */
-#line 167 "yacc.y"
+#line 168 "yacc.y"
     { (yyval.expression) = (yyvsp[(1) - (1)].expression); ;}
     break;
 
   case 21:
 
 /* Line 1455 of yacc.c  */
-#line 169 "yacc.y"
+#line 170 "yacc.y"
     { (yyval.expression) = new UnaryExpressionNode(Operator::INCREMENT, (yyvsp[(2) - (2)].expression)); ;}
     break;
 
   case 22:
 
 /* Line 1455 of yacc.c  */
-#line 171 "yacc.y"
+#line 172 "yacc.y"
     { (yyval.expression) = new UnaryExpressionNode(Operator::DECREMENT, (yyvsp[(2) - (2)].expression)); ;}
     break;
 
   case 23:
 
 /* Line 1455 of yacc.c  */
-#line 173 "yacc.y"
+#line 174 "yacc.y"
     { (yyval.expression) = new DereferenceExpressionNode((yyvsp[(2) - (2)].expression)); ;}
     break;
 
   case 24:
 
 /* Line 1455 of yacc.c  */
-#line 175 "yacc.y"
+#line 176 "yacc.y"
     { (yyval.expression) = new UnaryExpressionNode(Operator::REFERENCE, (yyvsp[(2) - (2)].expression)); ;}
     break;
 
   case 25:
 
 /* Line 1455 of yacc.c  */
-#line 177 "yacc.y"
+#line 178 "yacc.y"
     { (yyval.expression) = (yyvsp[(1) - (1)].expression); ;}
     break;
 
   case 26:
 
 /* Line 1455 of yacc.c  */
-#line 191 "yacc.y"
+#line 192 "yacc.y"
     {
     (yyval.expression) = (yyvsp[(1) - (1)].expression);
   ;}
@@ -1858,7 +1859,7 @@ yyreduce:
   case 27:
 
 /* Line 1455 of yacc.c  */
-#line 195 "yacc.y"
+#line 196 "yacc.y"
     {
     (yyval.expression) = new CastExpressionNode((yyvsp[(2) - (4)].type_name), (yyvsp[(4) - (4)].expression));
   ;}
@@ -1867,14 +1868,14 @@ yyreduce:
   case 28:
 
 /* Line 1455 of yacc.c  */
-#line 202 "yacc.y"
+#line 203 "yacc.y"
     { (yyval.expression) = new NewExpressionNode(static_cast<TypeSpecifierNode*>((yyvsp[(2) - (4)].type_specifier)), nullptr); ;}
     break;
 
   case 29:
 
 /* Line 1455 of yacc.c  */
-#line 204 "yacc.y"
+#line 205 "yacc.y"
     { (yyval.expression) = new NewExpressionNode(
         static_cast<TypeSpecifierNode*>((yyvsp[(2) - (5)].type_specifier)),
         static_cast<AbstractDeclaratorNode*>((yyvsp[(3) - (5)].node))); ;}
@@ -1883,7 +1884,7 @@ yyreduce:
   case 30:
 
 /* Line 1455 of yacc.c  */
-#line 211 "yacc.y"
+#line 212 "yacc.y"
     {
     (yyval.expression) = (yyvsp[(1) - (1)].expression);
   ;}
@@ -1892,7 +1893,7 @@ yyreduce:
   case 31:
 
 /* Line 1455 of yacc.c  */
-#line 215 "yacc.y"
+#line 216 "yacc.y"
     {
     (yyval.expression) = new BinaryExpressionNode(Operator::MULTIPLICATION, (yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression));
   ;}
@@ -1901,7 +1902,7 @@ yyreduce:
   case 32:
 
 /* Line 1455 of yacc.c  */
-#line 219 "yacc.y"
+#line 220 "yacc.y"
     {
     (yyval.expression) = new BinaryExpressionNode(Operator::DIVISION, (yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression));
   ;}
@@ -1910,7 +1911,7 @@ yyreduce:
   case 33:
 
 /* Line 1455 of yacc.c  */
-#line 223 "yacc.y"
+#line 224 "yacc.y"
     {
     (yyval.expression) = new BinaryExpressionNode(Operator::MODULAR, (yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression));
   ;}
@@ -1919,7 +1920,7 @@ yyreduce:
   case 34:
 
 /* Line 1455 of yacc.c  */
-#line 230 "yacc.y"
+#line 231 "yacc.y"
     {
     (yyval.expression) = (yyvsp[(1) - (1)].expression);
   ;}
@@ -1928,7 +1929,7 @@ yyreduce:
   case 35:
 
 /* Line 1455 of yacc.c  */
-#line 234 "yacc.y"
+#line 235 "yacc.y"
     {
     (yyval.expression) = new BinaryExpressionNode(Operator::ADDITION, (yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression));
   ;}
@@ -1937,7 +1938,7 @@ yyreduce:
   case 36:
 
 /* Line 1455 of yacc.c  */
-#line 238 "yacc.y"
+#line 239 "yacc.y"
     {
     (yyval.expression) = new BinaryExpressionNode(Operator::SUBTRACTION, (yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression));
   ;}
@@ -1946,7 +1947,7 @@ yyreduce:
   case 37:
 
 /* Line 1455 of yacc.c  */
-#line 245 "yacc.y"
+#line 246 "yacc.y"
     {
     (yyval.expression) = (yyvsp[(1) - (1)].expression);
   ;}
@@ -1955,7 +1956,7 @@ yyreduce:
   case 38:
 
 /* Line 1455 of yacc.c  */
-#line 249 "yacc.y"
+#line 250 "yacc.y"
     {
     (yyval.expression) = new BinaryExpressionNode(Operator::LEFT_SHIFT, (yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression));
   ;}
@@ -1964,7 +1965,7 @@ yyreduce:
   case 39:
 
 /* Line 1455 of yacc.c  */
-#line 253 "yacc.y"
+#line 254 "yacc.y"
     {
     (yyval.expression) = new BinaryExpressionNode(Operator::RIGHT_SHIFT, (yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression));
   ;}
@@ -1973,7 +1974,7 @@ yyreduce:
   case 40:
 
 /* Line 1455 of yacc.c  */
-#line 260 "yacc.y"
+#line 261 "yacc.y"
     {
     (yyval.expression) = (yyvsp[(1) - (1)].expression);
   ;}
@@ -1982,7 +1983,7 @@ yyreduce:
   case 41:
 
 /* Line 1455 of yacc.c  */
-#line 264 "yacc.y"
+#line 265 "yacc.y"
     {
     (yyval.expression) = new BinaryExpressionNode(Operator::LESS, (yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression));
   ;}
@@ -1991,7 +1992,7 @@ yyreduce:
   case 42:
 
 /* Line 1455 of yacc.c  */
-#line 268 "yacc.y"
+#line 269 "yacc.y"
     {
     (yyval.expression) = new BinaryExpressionNode(Operator::GREATER, (yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression));
   ;}
@@ -2000,7 +2001,7 @@ yyreduce:
   case 43:
 
 /* Line 1455 of yacc.c  */
-#line 272 "yacc.y"
+#line 273 "yacc.y"
     {
     (yyval.expression) = new BinaryExpressionNode(Operator::LESS_EQUAL, (yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression));
   ;}
@@ -2009,7 +2010,7 @@ yyreduce:
   case 44:
 
 /* Line 1455 of yacc.c  */
-#line 276 "yacc.y"
+#line 277 "yacc.y"
     {
     (yyval.expression) = new BinaryExpressionNode(Operator::GREATER_EQUAL, (yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression));
   ;}
@@ -2018,7 +2019,7 @@ yyreduce:
   case 45:
 
 /* Line 1455 of yacc.c  */
-#line 283 "yacc.y"
+#line 284 "yacc.y"
     {
     (yyval.expression) = (yyvsp[(1) - (1)].expression);
   ;}
@@ -2027,7 +2028,7 @@ yyreduce:
   case 46:
 
 /* Line 1455 of yacc.c  */
-#line 287 "yacc.y"
+#line 288 "yacc.y"
     {
     (yyval.expression) = new BinaryExpressionNode(Operator::EQUAL, (yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression));
   ;}
@@ -2036,7 +2037,7 @@ yyreduce:
   case 47:
 
 /* Line 1455 of yacc.c  */
-#line 291 "yacc.y"
+#line 292 "yacc.y"
     {
     (yyval.expression) = new BinaryExpressionNode(Operator::NOT_EQUAL, (yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression));
   ;}
@@ -2045,7 +2046,7 @@ yyreduce:
   case 48:
 
 /* Line 1455 of yacc.c  */
-#line 365 "yacc.y"
+#line 366 "yacc.y"
     {
     (yyval.expression) = (yyvsp[(1) - (1)].expression);
   ;}
@@ -2054,7 +2055,7 @@ yyreduce:
   case 49:
 
 /* Line 1455 of yacc.c  */
-#line 369 "yacc.y"
+#line 370 "yacc.y"
     {
     (yyval.expression) = new AssignmentExpressionNode((yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression));
   ;}
@@ -2063,7 +2064,7 @@ yyreduce:
   case 53:
 
 /* Line 1455 of yacc.c  */
-#line 385 "yacc.y"
+#line 386 "yacc.y"
     {
     (yyval.declaration_node) = new DeclarationNode((yyvsp[(1) - (3)].type_specifier), (yyvsp[(2) - (3)].init_declarator));
   ;}
@@ -2072,7 +2073,7 @@ yyreduce:
   case 54:
 
 /* Line 1455 of yacc.c  */
-#line 392 "yacc.y"
+#line 393 "yacc.y"
     {
     (yyval.init_declarator) = (yyvsp[(1) - (1)].init_declarator);
   ;}
@@ -2081,7 +2082,7 @@ yyreduce:
   case 55:
 
 /* Line 1455 of yacc.c  */
-#line 396 "yacc.y"
+#line 397 "yacc.y"
     {
     cout << "HAS NEXT\n";
     (yyvsp[(1) - (3)].init_declarator)->next = (yyvsp[(3) - (3)].init_declarator);
@@ -2092,7 +2093,7 @@ yyreduce:
   case 56:
 
 /* Line 1455 of yacc.c  */
-#line 405 "yacc.y"
+#line 406 "yacc.y"
     {
     (yyval.init_declarator) = new InitDeclaratorNode((yyvsp[(1) - (1)].declarator));
   ;}
@@ -2101,7 +2102,7 @@ yyreduce:
   case 57:
 
 /* Line 1455 of yacc.c  */
-#line 409 "yacc.y"
+#line 410 "yacc.y"
     {
     (yyval.init_declarator) = new InitDeclaratorNode((yyvsp[(1) - (3)].declarator), (yyvsp[(3) - (3)].initializer));
   ;}
@@ -2110,7 +2111,7 @@ yyreduce:
   case 58:
 
 /* Line 1455 of yacc.c  */
-#line 416 "yacc.y"
+#line 417 "yacc.y"
     {
     (yyval.type_specifier) = new TypeSpecifierNode(Type::VOID);
   ;}
@@ -2119,7 +2120,7 @@ yyreduce:
   case 59:
 
 /* Line 1455 of yacc.c  */
-#line 420 "yacc.y"
+#line 421 "yacc.y"
     {
     (yyval.type_specifier) = new TypeSpecifierNode(Type::INTEGER);
   ;}
@@ -2128,7 +2129,7 @@ yyreduce:
   case 60:
 
 /* Line 1455 of yacc.c  */
-#line 424 "yacc.y"
+#line 425 "yacc.y"
     {
     (yyval.type_specifier) = new TypeSpecifierNode(Type::FLOAT);
   ;}
@@ -2137,7 +2138,7 @@ yyreduce:
   case 61:
 
 /* Line 1455 of yacc.c  */
-#line 428 "yacc.y"
+#line 429 "yacc.y"
     {
     (yyval.type_specifier) = new TypeSpecifierNode(Type::ASYNC);
   ;}
@@ -2146,7 +2147,7 @@ yyreduce:
   case 62:
 
 /* Line 1455 of yacc.c  */
-#line 435 "yacc.y"
+#line 436 "yacc.y"
     {
     (yyval.declarator) = new DeclaratorNode((yyvsp[(2) - (2)].direct_declarator));
     (yyval.declarator)->pointer = static_cast<PointerNode*>((yyvsp[(1) - (2)].node));
@@ -2156,7 +2157,7 @@ yyreduce:
   case 63:
 
 /* Line 1455 of yacc.c  */
-#line 440 "yacc.y"
+#line 441 "yacc.y"
     {
     (yyval.declarator) = new DeclaratorNode((yyvsp[(1) - (1)].direct_declarator));
   ;}
@@ -2165,7 +2166,7 @@ yyreduce:
   case 64:
 
 /* Line 1455 of yacc.c  */
-#line 447 "yacc.y"
+#line 448 "yacc.y"
     {
     (yyval.direct_declarator) = new DirectDeclaratorNode(new IdentifierNode(yylval.id));
   ;}
@@ -2174,7 +2175,7 @@ yyreduce:
   case 65:
 
 /* Line 1455 of yacc.c  */
-#line 451 "yacc.y"
+#line 452 "yacc.y"
     {
     // Todo : Only 1-dimensional array is allowed
     (yyval.direct_declarator) = (yyvsp[(1) - (4)].direct_declarator);
@@ -2185,7 +2186,7 @@ yyreduce:
   case 66:
 
 /* Line 1455 of yacc.c  */
-#line 460 "yacc.y"
+#line 461 "yacc.y"
     {
     (yyval.node) = new PointerNode();
   ;}
@@ -2194,7 +2195,7 @@ yyreduce:
   case 67:
 
 /* Line 1455 of yacc.c  */
-#line 464 "yacc.y"
+#line 465 "yacc.y"
     {
     (yyval.node) = new PointerNode();
     (yyval.node)->next = (yyvsp[(2) - (2)].node);
@@ -2204,7 +2205,7 @@ yyreduce:
   case 68:
 
 /* Line 1455 of yacc.c  */
-#line 472 "yacc.y"
+#line 473 "yacc.y"
     {
     (yyval.type_name) = new TypeNameNode(
         static_cast<TypeSpecifierNode*>((yyvsp[(1) - (2)].type_specifier)),
@@ -2215,7 +2216,7 @@ yyreduce:
   case 69:
 
 /* Line 1455 of yacc.c  */
-#line 481 "yacc.y"
+#line 482 "yacc.y"
     { 
     AbstractDeclaratorNode *node = new AbstractDeclaratorNode();
     node->pointer = static_cast<PointerNode*>((yyvsp[(1) - (1)].node));
@@ -2226,7 +2227,7 @@ yyreduce:
   case 70:
 
 /* Line 1455 of yacc.c  */
-#line 487 "yacc.y"
+#line 488 "yacc.y"
     {
     AbstractDeclaratorNode *node = new AbstractDeclaratorNode();
     node->direct_abstract_declarator = static_cast<DirectAbstractDeclaratorNode*>((yyvsp[(1) - (1)].node));
@@ -2237,7 +2238,7 @@ yyreduce:
   case 71:
 
 /* Line 1455 of yacc.c  */
-#line 493 "yacc.y"
+#line 494 "yacc.y"
     {
     AbstractDeclaratorNode *node = new AbstractDeclaratorNode();
     node->pointer = static_cast<PointerNode*>((yyvsp[(1) - (2)].node));
@@ -2249,7 +2250,7 @@ yyreduce:
   case 72:
 
 /* Line 1455 of yacc.c  */
-#line 503 "yacc.y"
+#line 504 "yacc.y"
     {
     (yyval.node) = new DirectAbstractDeclaratorNode();
   ;}
@@ -2258,7 +2259,7 @@ yyreduce:
   case 73:
 
 /* Line 1455 of yacc.c  */
-#line 510 "yacc.y"
+#line 511 "yacc.y"
     {
     (yyval.expression) = new ConstantExpressionNode(yylval.num);
   ;}
@@ -2267,7 +2268,7 @@ yyreduce:
   case 74:
 
 /* Line 1455 of yacc.c  */
-#line 516 "yacc.y"
+#line 517 "yacc.y"
     {
     (yyval.initializer) = new InitializerNode((yyvsp[(1) - (1)].expression));
   ;}
@@ -2276,70 +2277,70 @@ yyreduce:
   case 75:
 
 /* Line 1455 of yacc.c  */
-#line 522 "yacc.y"
+#line 523 "yacc.y"
     { (yyval.statement) = (yyvsp[(1) - (1)].statement); ;}
     break;
 
   case 76:
 
 /* Line 1455 of yacc.c  */
-#line 523 "yacc.y"
+#line 524 "yacc.y"
     { (yyval.statement) = (yyvsp[(1) - (1)].statement); ;}
     break;
 
   case 77:
 
 /* Line 1455 of yacc.c  */
-#line 524 "yacc.y"
+#line 525 "yacc.y"
     { (yyval.statement) = (yyvsp[(1) - (1)].statement); ;}
     break;
 
   case 78:
 
 /* Line 1455 of yacc.c  */
-#line 525 "yacc.y"
+#line 526 "yacc.y"
     { (yyval.statement) = (yyvsp[(1) - (1)].statement); ;}
     break;
 
   case 79:
 
 /* Line 1455 of yacc.c  */
-#line 526 "yacc.y"
+#line 527 "yacc.y"
     { (yyval.statement) = (yyvsp[(1) - (1)].statement); ;}
     break;
 
   case 80:
 
 /* Line 1455 of yacc.c  */
-#line 527 "yacc.y"
+#line 528 "yacc.y"
     { (yyval.statement) = (yyvsp[(1) - (1)].statement); ;}
     break;
 
   case 81:
 
 /* Line 1455 of yacc.c  */
-#line 528 "yacc.y"
+#line 529 "yacc.y"
     { (yyval.statement) = (yyvsp[(1) - (1)].statement); ;}
     break;
 
   case 82:
 
 /* Line 1455 of yacc.c  */
-#line 529 "yacc.y"
+#line 530 "yacc.y"
     { (yyval.statement) = (yyvsp[(1) - (1)].statement); ;}
     break;
 
   case 83:
 
 /* Line 1455 of yacc.c  */
-#line 530 "yacc.y"
+#line 531 "yacc.y"
     { (yyval.statement) = (yyvsp[(1) - (1)].statement); ;}
     break;
 
   case 84:
 
 /* Line 1455 of yacc.c  */
-#line 536 "yacc.y"
+#line 537 "yacc.y"
     {
     (yyval.statement) = (yyvsp[(1) - (2)].expression);
   ;}
@@ -2348,7 +2349,7 @@ yyreduce:
   case 85:
 
 /* Line 1455 of yacc.c  */
-#line 543 "yacc.y"
+#line 544 "yacc.y"
     {
     (yyval.function_definition) = new FunctionDefinitionNode((yyvsp[(1) - (6)].type_specifier), (yyvsp[(2) - (6)].declarator), (yyvsp[(4) - (6)].parameter_declaration), static_cast<CompoundStatementNode*>((yyvsp[(6) - (6)].statement)));
   ;}
@@ -2357,7 +2358,7 @@ yyreduce:
   case 86:
 
 /* Line 1455 of yacc.c  */
-#line 547 "yacc.y"
+#line 548 "yacc.y"
     {
     (yyval.function_definition) = new FunctionDefinitionNode((yyvsp[(1) - (5)].type_specifier), (yyvsp[(2) - (5)].declarator), nullptr, static_cast<CompoundStatementNode*>((yyvsp[(5) - (5)].statement)));
   ;}
@@ -2366,7 +2367,7 @@ yyreduce:
   case 87:
 
 /* Line 1455 of yacc.c  */
-#line 554 "yacc.y"
+#line 555 "yacc.y"
     {
     (yyval.parameter_declaration) = (yyvsp[(1) - (1)].parameter_declaration);
   ;}
@@ -2375,7 +2376,7 @@ yyreduce:
   case 88:
 
 /* Line 1455 of yacc.c  */
-#line 558 "yacc.y"
+#line 559 "yacc.y"
     {
     (yyvsp[(1) - (3)].parameter_declaration)->next = (yyvsp[(3) - (3)].parameter_declaration);
     (yyval.parameter_declaration) = (yyvsp[(1) - (3)].parameter_declaration);
@@ -2385,7 +2386,7 @@ yyreduce:
   case 89:
 
 /* Line 1455 of yacc.c  */
-#line 566 "yacc.y"
+#line 567 "yacc.y"
     {
     (yyval.parameter_declaration) = new ParameterDeclarationNode((yyvsp[(1) - (2)].type_specifier), (yyvsp[(2) - (2)].declarator));
   ;}
@@ -2394,7 +2395,7 @@ yyreduce:
   case 90:
 
 /* Line 1455 of yacc.c  */
-#line 573 "yacc.y"
+#line 574 "yacc.y"
     {
     (yyval.statement) = new CompoundStatementNode(nullptr);
   ;}
@@ -2403,7 +2404,7 @@ yyreduce:
   case 91:
 
 /* Line 1455 of yacc.c  */
-#line 577 "yacc.y"
+#line 578 "yacc.y"
     {
     (yyval.statement) = new CompoundStatementNode((yyvsp[(2) - (3)].node));
   ;}
@@ -2412,7 +2413,7 @@ yyreduce:
   case 92:
 
 /* Line 1455 of yacc.c  */
-#line 584 "yacc.y"
+#line 585 "yacc.y"
     {
     (yyval.node) = (yyvsp[(1) - (1)].declaration_node);
   ;}
@@ -2421,7 +2422,7 @@ yyreduce:
   case 93:
 
 /* Line 1455 of yacc.c  */
-#line 588 "yacc.y"
+#line 589 "yacc.y"
     {
     (yyval.node) = (yyvsp[(1) - (1)].statement);
   ;}
@@ -2430,7 +2431,7 @@ yyreduce:
   case 94:
 
 /* Line 1455 of yacc.c  */
-#line 592 "yacc.y"
+#line 593 "yacc.y"
     {
     (yyvsp[(1) - (2)].declaration_node)->next = (yyvsp[(2) - (2)].node);
     (yyval.node) = (yyvsp[(1) - (2)].declaration_node);
@@ -2440,7 +2441,7 @@ yyreduce:
   case 95:
 
 /* Line 1455 of yacc.c  */
-#line 597 "yacc.y"
+#line 598 "yacc.y"
     {
     (yyvsp[(1) - (2)].statement)->next = (yyvsp[(2) - (2)].node);
     (yyval.node) = (yyvsp[(1) - (2)].statement);
@@ -2450,7 +2451,7 @@ yyreduce:
   case 96:
 
 /* Line 1455 of yacc.c  */
-#line 605 "yacc.y"
+#line 606 "yacc.y"
     {
     (yyval.statement) = new SelectionStatementNode((yyvsp[(3) - (5)].expression), (yyvsp[(5) - (5)].statement));
   ;}
@@ -2459,7 +2460,7 @@ yyreduce:
   case 97:
 
 /* Line 1455 of yacc.c  */
-#line 608 "yacc.y"
+#line 609 "yacc.y"
     {
     (yyval.statement) = new SelectionStatementNode((yyvsp[(3) - (7)].expression), (yyvsp[(5) - (7)].statement), (yyvsp[(7) - (7)].statement));
   ;}
@@ -2468,7 +2469,7 @@ yyreduce:
   case 98:
 
 /* Line 1455 of yacc.c  */
-#line 615 "yacc.y"
+#line 616 "yacc.y"
     {
     (yyval.statement) = new IterationStatementNode((yyvsp[(3) - (5)].expression), (yyvsp[(5) - (5)].statement));
   ;}
@@ -2477,14 +2478,14 @@ yyreduce:
   case 99:
 
 /* Line 1455 of yacc.c  */
-#line 621 "yacc.y"
+#line 622 "yacc.y"
     { (yyval.statement) = new ForStatementNode((yyvsp[(3) - (7)].declaration_node), (yyvsp[(4) - (7)].statement), (yyvsp[(5) - (7)].expression), (yyvsp[(7) - (7)].statement)); ;}
     break;
 
   case 100:
 
 /* Line 1455 of yacc.c  */
-#line 626 "yacc.y"
+#line 627 "yacc.y"
     {
     (yyval.statement) = new ReturnStatementNode((yyvsp[(2) - (3)].expression));
   ;}
@@ -2493,7 +2494,7 @@ yyreduce:
   case 101:
 
 /* Line 1455 of yacc.c  */
-#line 630 "yacc.y"
+#line 631 "yacc.y"
     {
     (yyval.statement) = new ReturnStatementNode();
   ;}
@@ -2502,7 +2503,7 @@ yyreduce:
   case 102:
 
 /* Line 1455 of yacc.c  */
-#line 637 "yacc.y"
+#line 638 "yacc.y"
     {
     (yyval.statement) = new RunStatementNode((yyvsp[(2) - (3)].expression));
   ;}
@@ -2511,7 +2512,7 @@ yyreduce:
   case 103:
 
 /* Line 1455 of yacc.c  */
-#line 641 "yacc.y"
+#line 642 "yacc.y"
     {
     (yyval.statement) = new JoinStatementNode((yyvsp[(2) - (3)].expression));
   ;}
@@ -2520,7 +2521,7 @@ yyreduce:
   case 104:
 
 /* Line 1455 of yacc.c  */
-#line 648 "yacc.y"
+#line 649 "yacc.y"
     {
     (yyval.statement) = new PrintStatementNode((yyvsp[(2) - (3)].expression));
   ;}
@@ -2529,7 +2530,7 @@ yyreduce:
   case 105:
 
 /* Line 1455 of yacc.c  */
-#line 654 "yacc.y"
+#line 655 "yacc.y"
     {
     (yyval.statement) = new InputStatementNode((yyvsp[(2) - (3)].expression));
   ;}
@@ -2538,29 +2539,43 @@ yyreduce:
   case 106:
 
 /* Line 1455 of yacc.c  */
-#line 660 "yacc.y"
+#line 661 "yacc.y"
     {
     (yyvsp[(1) - (1)].declaration_node)->Print();
     visitor->Visit((yyvsp[(1) - (1)].declaration_node));
+    
+    symbol_table->code.erase(std::remove_if(symbol_table->code.begin(), 
+                              symbol_table->code.end(),
+                              [](string str){return str.compare("__end:") == 0;}),
+                              symbol_table->code.end());
+    symbol_table->code.push_back("__end:");
     symbol_table->PrintCode();
+    cout << endl;
   ;}
     break;
 
   case 107:
 
 /* Line 1455 of yacc.c  */
-#line 666 "yacc.y"
+#line 674 "yacc.y"
     {
     (yyvsp[(1) - (1)].function_definition)->Print();
     visitor->Visit((yyvsp[(1) - (1)].function_definition));
+    
+    symbol_table->code.erase(std::remove_if(symbol_table->code.begin(), 
+                              symbol_table->code.end(),
+                              [](string str){return str.compare("__end:") == 0;}),
+                              symbol_table->code.end());
+    symbol_table->code.push_back("__end:");
     symbol_table->PrintCode();
+    cout << endl;
   ;}
     break;
 
 
 
 /* Line 1455 of yacc.c  */
-#line 2564 "yacc.tab.c"
+#line 2579 "yacc.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2772,11 +2787,12 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 678 "yacc.y"
+#line 693 "yacc.y"
 
 
 
 main() {
+  std::cout << "::: Input your code.. " << endl;
   init_ast();
   yyparse();
   // root->Print();

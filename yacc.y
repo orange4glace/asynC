@@ -3,6 +3,7 @@
 #include <string>
 #include <stdlib.h>
 #include <map>
+#include <algorithm>
 #include <list>
 #include "ast/ast.h"
 #include "ast/parser/visitor.h"
@@ -660,13 +661,27 @@ external_declaration
   {
     $1->Print();
     visitor->Visit($1);
+    
+    symbol_table->code.erase(std::remove_if(symbol_table->code.begin(), 
+                              symbol_table->code.end(),
+                              [](string str){return str.compare("__end:") == 0;}),
+                              symbol_table->code.end());
+    symbol_table->code.push_back("__end:");
     symbol_table->PrintCode();
+    cout << endl;
   }
   | function_definition
   {
     $1->Print();
     visitor->Visit($1);
+    
+    symbol_table->code.erase(std::remove_if(symbol_table->code.begin(), 
+                              symbol_table->code.end(),
+                              [](string str){return str.compare("__end:") == 0;}),
+                              symbol_table->code.end());
+    symbol_table->code.push_back("__end:");
     symbol_table->PrintCode();
+    cout << endl;
   }
   ;
 
@@ -679,6 +694,7 @@ translation_unit
 
 
 main() {
+  std::cout << "::: Input your code.. " << endl;
   init_ast();
   yyparse();
   // root->Print();
